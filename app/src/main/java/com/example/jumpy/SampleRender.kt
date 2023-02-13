@@ -64,39 +64,14 @@ class SampleRender(
     }
 
     fun draw(mesh: Mesh, shader: Shader) {
-        //draw(mesh, shader,  /*framebuffer=*/null)
+        draw(mesh, shader,  /*framebuffer=*/null)
     }
 
 
-    fun draw(mesh: Mesh, shader: Shader,primitiveMode : Int ,framebuffer: Framebuffer?) {
-       /* useFramebuffer(framebuffer)
+    fun draw(mesh: Mesh, shader: Shader ,framebuffer: Framebuffer?) {
+        useFramebuffer(framebuffer)
         shader.lowLevelUse()
-
-        val vertexArrayId = mesh.getVertexArrayID()
-        check(vertexArrayId != 0) { "Tried to draw a freed Mesh" }
-
-        GLES30.glBindVertexArray(vertexArrayId)
-        GLError.maybeThrowGLException("Failed to bind vertex array object", "glBindVertexArray")
-
-        //no indices
-        if (mesh.indexBuffer == null) {
-            // Sanity check for debugging
-            val numberOfVertices: Int = mesh.vertexBuffers.get(0).getNumberOfVertices()
-            for (i in 1 until mesh.vertexBuffers.size) {
-                check(
-                    !(mesh.vertexBuffers.get(i).getNumberOfVertices() !== numberOfVertices)
-                ) { "Vertex buffers have mismatching numbers of vertices" }
-            }
-            GLES30.glDrawArrays(primitiveMode, 0, numberOfVertices)
-            GLError.maybeThrowGLException("Failed to draw vertex array object", "glDrawArrays")
-        } else {
-            GLES30.glDrawElements(
-                primitiveMode, indexBuffer.getSize(), GLES30.GL_UNSIGNED_INT, 0
-            )
-            GLError.maybeThrowGLException(
-                "Failed to draw vertex array object with indices", "glDrawElements"
-            )
-        }*/
+        mesh.lowLevelDraw()
     }
 
 

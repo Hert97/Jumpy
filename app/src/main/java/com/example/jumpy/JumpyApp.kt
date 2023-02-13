@@ -2,8 +2,13 @@ package com.example.jumpy
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.jumpy.helpers.ARCoreSessionLifecycleHelper
+import com.example.jumpy.helpers.CameraPermissionHelper
+import com.example.jumpy.helpers.FullScreenHelper
+import com.google.ar.core.Config
+import com.google.ar.core.Session
 import com.google.ar.core.exceptions.*
 
 class JumpyApp : AppCompatActivity() {
@@ -43,7 +48,7 @@ class JumpyApp : AppCompatActivity() {
             }
 
         // Configure session features, including: Lighting Estimation, Depth mode, Instant Placement.
-        //arCoreSessionHelper.beforeSessionResume = ::configureSession
+        arCoreSessionHelper.beforeSessionResume = ::configureSession
         lifecycle.addObserver(arCoreSessionHelper)
 
         // Set up the game AR renderer.
@@ -61,5 +66,53 @@ class JumpyApp : AppCompatActivity() {
         //depthSettings.onCreate(this)
         //instantPlacementSettings.onCreate(this)
     }
+    // Configure the session, using Lighting Estimation, and Depth mode.
+    fun configureSession(session: Session) {
+        session.configure(
+            session.config.apply {
+                lightEstimationMode = Config.LightEstimationMode.ENVIRONMENTAL_HDR
 
+                // Depth API is used if it is configured in Hello AR's settings.
+                depthMode =
+                    if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
+                        Config.DepthMode.AUTOMATIC
+                    } else {
+                        Config.DepthMode.DISABLED
+                    }
+
+                // Instant Placement is used if it is configured in AR's settings.
+                instantPlacementMode = Config.InstantPlacementMode.DISABLED
+
+                /*instantPlacementMode =
+                    if (instantPlacementSettings.isInstantPlacementEnabled) {
+                        Config.InstantPlacementMode.LOCAL_Y_UP
+                    } else {
+                        Config.InstantPlacementMode.DISABLED
+                    }*/
+            }
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        results: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, results)
+        if (!CameraPermissionHelper.hasCameraPermission(this)) {
+            // Use toast instead of snackbar here since the activity will exit.
+            Toast.makeText(this, "Camera permission is needed to run this application", Toast.LENGTH_LONG)
+                .show()
+            if (!CameraPermissionHelper.shouldShowRequestPermissionRationale(this)) {
+                // Permission denied with checking "Do not ask again".
+                CameraPermissionHelper.launchPermissionSettings(this)
+            }
+            finish()
+        }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        FullScreenHelper.setFullScreenOnWindowFocusChanged(this, hasFocus)
+    }
 }
