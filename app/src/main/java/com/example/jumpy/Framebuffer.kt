@@ -3,10 +3,10 @@ package com.example.jumpy
 import android.opengl.GLES30
 import android.util.Log
 import java.io.Closeable
-
+import com.example.jumpy.Texture
 
 /** A framebuffer associated with a texture.  */
-class Framebuffer(render: RendererBase?, width: Int, height: Int) :
+class Framebuffer(render: SampleRender?, width: Int, height: Int) :
     Closeable {
     private val framebufferId = intArrayOf(0)
     private var colorTexture: Texture? = null
@@ -29,12 +29,14 @@ class Framebuffer(render: RendererBase?, width: Int, height: Int) :
     init {
         try {
             colorTexture = Texture(
-                Texture.TextureTarget.TEXTURE_2D,
+                render,
+                Texture.Target.TEXTURE_2D,
                 Texture.WrapMode.CLAMP_TO_EDGE,  /*useMipmaps=*/
                 false
             )
             depthTexture = Texture(
-                Texture.TextureTarget.TEXTURE_2D,
+                render,
+                Texture.Target.TEXTURE_2D,
                 Texture.WrapMode.CLAMP_TO_EDGE,  /*useMipmaps=*/
                 false
             )

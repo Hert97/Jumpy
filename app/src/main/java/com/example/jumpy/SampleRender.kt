@@ -21,7 +21,7 @@ import javax.microedition.khronos.opengles.GL10
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-class RendererBase(
+class SampleRender(
     glSurfaceView: GLSurfaceView,
     renderer: Renderer, /* package-private */
     val assets: AssetManager
@@ -45,18 +45,18 @@ class RendererBase(
                 override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
                     GLES30.glEnable(GLES30.GL_BLEND)
                     GLError.maybeThrowGLException("Failed to enable blending", "glEnable")
-                    renderer.onSurfaceCreated(this@RendererBase)
+                    renderer.onSurfaceCreated(this@SampleRender)
                 }
 
                 override fun onSurfaceChanged(gl: GL10, w: Int, h: Int) {
                     viewportWidth = w
                     viewportHeight = h
-                    renderer.onSurfaceChanged(this@RendererBase, w, h)
+                    renderer.onSurfaceChanged(this@SampleRender, w, h)
                 }
 
                 override fun onDrawFrame(gl: GL10) {
                     clear( /*framebuffer=*/null, 0f, 0f, 0f, 1f)
-                    renderer.onDrawFrame(this@RendererBase)
+                    renderer.onDrawFrame(this@SampleRender)
                 }
             })
         glSurfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
@@ -126,7 +126,7 @@ class RendererBase(
          *
          * See [GLSurfaceView.Renderer.onSurfaceCreated].
          */
-        fun onSurfaceCreated(render: RendererBase?)
+        fun onSurfaceCreated(render: SampleRender?)
 
         /**
          * Called by [SampleRender] when the GL render surface dimensions are changed.
@@ -134,7 +134,7 @@ class RendererBase(
          *
          * See [GLSurfaceView.Renderer.onSurfaceChanged].
          */
-        fun onSurfaceChanged(render: RendererBase?, width: Int, height: Int)
+        fun onSurfaceChanged(render: SampleRender?, width: Int, height: Int)
 
         /**
          * Called by [SampleRender] when a GL frame is to be rendered.
@@ -142,7 +142,7 @@ class RendererBase(
          *
          * See [GLSurfaceView.Renderer.onDrawFrame].
          */
-        fun onDrawFrame(render: RendererBase?)
+        fun onDrawFrame(render: SampleRender?)
     }
 
     private fun useFramebuffer(framebuffer: Framebuffer?) {
@@ -166,6 +166,6 @@ class RendererBase(
 
 
     companion object {
-        private val TAG = RendererBase::class.java.simpleName
+        private val TAG = SampleRender::class.java.simpleName
     }
 }

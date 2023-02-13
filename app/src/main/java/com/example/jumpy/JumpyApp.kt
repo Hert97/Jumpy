@@ -3,11 +3,17 @@ package com.example.jumpy
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.example.jumpy.helpers.ARCoreSessionLifecycleHelper
 import com.google.ar.core.exceptions.*
 
 class JumpyApp : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "JumpyApp"
+    }
+
     lateinit var arCoreSessionHelper: ARCoreSessionLifecycleHelper
-    lateinit var view: HelloArView
+    lateinit var view: JumpyArView
     lateinit var renderer: JumpyArRenderer
 
     //val instantPlacementSettings = InstantPlacementSettings()
@@ -33,7 +39,7 @@ class JumpyApp : AppCompatActivity() {
                         else -> "Failed to create AR session: $exception"
                     }
                 Log.e(TAG, "ARCore threw an exception", exception)
-                view.snackbarHelper.showError(this, message)
+                //view.snackbarHelper.showError(this, message)
             }
 
         // Configure session features, including: Lighting Estimation, Depth mode, Instant Placement.
@@ -44,15 +50,13 @@ class JumpyApp : AppCompatActivity() {
         renderer = JumpyArRenderer(this)
         lifecycle.addObserver(renderer)
 
-        // Set up Hello AR UI.
-        //view = JumpyArView(this)
+        // Set up game AR UI.
+        view = JumpyArView(this)
         lifecycle.addObserver(view)
         setContentView(view.root)
 
         // Sets up an example renderer using our HelloARRenderer.
-        RendererBase(view.surfaceView, renderer, assets)
-
-
+        SampleRender(view.surfaceView, renderer, assets)
 
         //depthSettings.onCreate(this)
         //instantPlacementSettings.onCreate(this)

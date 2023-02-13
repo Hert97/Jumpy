@@ -1,6 +1,23 @@
+
+
+/*
+* Copyright 2020 Google LLC
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 package com.example.jumpy
 
-import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.opengl.GLES11Ext
@@ -10,9 +27,11 @@ import java.io.Closeable
 import java.io.IOException
 import java.nio.ByteBuffer
 
-
 /** A GPU-side texture.  */
-class Texture(val target: TextureTarget, wrapMode: WrapMode, useMipmaps: Boolean) :
+class Texture(
+    render: SampleRender?, /* package-private */
+    val target: Target, wrapMode: WrapMode, useMipmaps: Boolean
+) :
     Closeable {
     private val textureId = intArrayOf(0)
 
@@ -35,7 +54,7 @@ class Texture(val target: TextureTarget, wrapMode: WrapMode, useMipmaps: Boolean
      *
      * @see [glBindTexture](https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glBindTexture.xhtml).
      */
-    enum class TextureTarget(val glesEnum: Int) {
+    enum class Target(val glesEnum: Int) {
         TEXTURE_2D(GLES30.GL_TEXTURE_2D), TEXTURE_EXTERNAL_OES(GLES11Ext.GL_TEXTURE_EXTERNAL_OES), TEXTURE_CUBE_MAP(
             GLES30.GL_TEXTURE_CUBE_MAP
         );
@@ -50,6 +69,20 @@ class Texture(val target: TextureTarget, wrapMode: WrapMode, useMipmaps: Boolean
         LINEAR(GLES30.GL_RGBA8), SRGB(GLES30.GL_SRGB8_ALPHA8);
     }
 
+    /**
+     * Construct an empty [Texture].
+     *
+     *
+     * Since [Texture]s created in this way are not populated with data, this method is
+     * mostly only useful for creating [Target.TEXTURE_EXTERNAL_OES] textures. See [ ][.createFromAsset] if you want a texture with data.
+     */
+    constructor(render: SampleRender?, target: Target, wrapMode: WrapMode) : this(
+        render,
+        target,
+        wrapMode,  /*useMipmaps=*/
+        true
+    ) {
+    }
 
     init {
         GLES30.glGenTextures(1, textureId, 0)
@@ -91,13 +124,12 @@ class Texture(val target: TextureTarget, wrapMode: WrapMode, useMipmaps: Boolean
         /** Create a texture from the given asset file name.  */
         @Throws(IOException::class)
         fun createFromAsset(
-            assetManager: AssetManager,
-            assetFileName: String,
-            wrapMode: Texture.WrapMode,
-            colorFormat: Texture.ColorFormat,
-            useMips : Boolean = true
+            render: SampleRender,
+            assetFileName: String?,
+            wrapMode: WrapMode,
+            colorFormat: ColorFormat
         ): Texture {
-            val texture = Texture(Texture.TextureTarget.TEXTURE_2D, wrapMode,useMips)
+            val texture = Texture(render, Target.TEXTURE_2D, wrapMode)
             var bitmap: Bitmap? = null
             try {
                 // The following lines up to glTexImage2D could technically be replaced with
@@ -106,7 +138,7 @@ class Texture(val target: TextureTarget, wrapMode: WrapMode, useMipmaps: Boolean
                 // Load and convert the bitmap and copy its contents to a direct ByteBuffer. Despite its name,
                 // the ARGB_8888 config is actually stored in RGBA order.
                 bitmap = convertBitmapToConfig(
-                    BitmapFactory.decodeStream(assetManager.open(assetFileName)),
+                    BitmapFactory.decodeStream(render.assets.open(assetFileName!!)),
                     Bitmap.Config.ARGB_8888
                 )
                 val buffer = ByteBuffer.allocateDirect(bitmap.byteCount)
@@ -147,7 +179,5 @@ class Texture(val target: TextureTarget, wrapMode: WrapMode, useMipmaps: Boolean
             bitmap.recycle()
             return result
         }
-
-
     }
 }
