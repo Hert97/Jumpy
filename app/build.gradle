@@ -6,7 +6,6 @@ plugins {
 android {
     namespace 'com.example.jumpy'
     compileSdk 33
-
     defaultConfig {
         applicationId "com.example.jumpy"
         minSdk 29

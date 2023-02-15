@@ -43,8 +43,9 @@ import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.NotYetAvailableException
 import java.io.IOException
 import java.nio.ByteBuffer
+import java.nio.FloatBuffer
+import java.nio.IntBuffer
 
-/** Renders the HelloAR application using our example Renderer. */
 class JumpyArRenderer(val activity: JumpyActivity) :
   SampleRender.Renderer, DefaultLifecycleObserver {
   companion object {
@@ -129,6 +130,7 @@ class JumpyArRenderer(val activity: JumpyActivity) :
   val displayRotationHelper = DisplayRotationHelper(activity)
   val trackingStateHelper = TrackingStateHelper(activity)
 
+
   override fun onResume(owner: LifecycleOwner) {
     displayRotationHelper.onResume()
     hasSetTextureNames = false
@@ -138,11 +140,13 @@ class JumpyArRenderer(val activity: JumpyActivity) :
     displayRotationHelper.onPause()
   }
 
-  override fun onSurfaceCreated(render: SampleRender) {
+  override fun onSurfaceCreated(render: SampleRender?) {
     // Prepare the rendering objects.
     // This involves reading shaders and 3D model files, so may throw an IOException.
     try {
-      planeRenderer = PlaneRenderer(render)
+
+
+      planeRenderer = PlaneRenderer(render!!)
       backgroundRenderer = BackgroundRenderer(render)
       virtualSceneFramebuffer = Framebuffer(render, /*width=*/ 1, /*height=*/ 1)
 
@@ -166,7 +170,7 @@ class JumpyArRenderer(val activity: JumpyActivity) :
       activity.assets.open("models/dfg.raw").use { it.read(buffer.array()) }
 
       // SampleRender abstraction leaks here.
-      GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, dfgTexture.textureId)
+      GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, dfgTexture.getTextureId())
       GLError.maybeThrowGLException("Failed to bind DFG texture", "glBindTexture")
       GLES30.glTexImage2D(
         GLES30.GL_TEXTURE_2D,
@@ -241,19 +245,19 @@ class JumpyArRenderer(val activity: JumpyActivity) :
     }
   }
 
-  override fun onSurfaceChanged(render: SampleRender, width: Int, height: Int) {
+  override fun onSurfaceChanged(render: SampleRender?, width: Int, height: Int) {
     displayRotationHelper.onSurfaceChanged(width, height)
     virtualSceneFramebuffer.resize(width, height)
   }
 
-  override fun onDrawFrame(render: SampleRender) {
+  override fun onDrawFrame(render: SampleRender?) {
     val session = session ?: return
 
     // Texture names should only be set once on a GL thread unless they change. This is done during
     // onDrawFrame rather than onSurfaceCreated since the session is not guaranteed to have been
     // initialized during the execution of onSurfaceCreated.
     if (!hasSetTextureNames) {
-      session.setCameraTextureNames(intArrayOf(backgroundRenderer.cameraColorTexture.textureId))
+      session.setCameraTextureNames(intArrayOf(backgroundRenderer.cameraColorTexture.getTextureId()))
       hasSetTextureNames = true
     }
 
@@ -280,10 +284,10 @@ class JumpyArRenderer(val activity: JumpyActivity) :
     // Update BackgroundRenderer state to match the depth settings.
     try {
       backgroundRenderer.setUseDepthVisualization(
-        render,
+        render!!,
         activity.depthSettings.depthColorVisualizationEnabled()
       )
-      backgroundRenderer.setUseOcclusion(render, activity.depthSettings.useDepthForOcclusion())
+      backgroundRenderer.setUseOcclusion(render!!, activity.depthSettings.useDepthForOcclusion())
     } catch (e: IOException) {
       Log.e(TAG, "Failed to read a required asset file", e)
       showError("Failed to read a required asset file: $e")
@@ -346,6 +350,7 @@ class JumpyArRenderer(val activity: JumpyActivity) :
     }
 
     // -- Draw non-occluded virtual objects (planes, point cloud)
+    //TODO draw a sprite (create a shader for it set mvp matrix as uniform)
 
     // Get projection matrix.
     camera.getProjectionMatrix(projectionMatrix, 0, Z_NEAR, Z_FAR)
