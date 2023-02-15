@@ -13,11 +13,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_menu)
 
-        val buttonPlay = findViewById<Button>(R.id.button_play)
-        val buttonExit = findViewById<Button>(R.id.button_exit)
+        val buttonPlay : Button = findViewById(R.id.button_play)
+        val buttonExit : Button = findViewById(R.id.button_exit)
+        val buttonCredit : Button = findViewById(R.id.button_credit)
 
         buttonPlay.setOnClickListener(this)
         buttonExit.setOnClickListener(this)
+        buttonCredit.setOnClickListener(this)
     }
 
     override fun onClick(view: View) {
@@ -28,6 +30,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
             R.id.button_exit -> {
                 finish()
+            }
+            R.id.button_credit -> {
+                val intent = Intent(this, CreditActivity::class.java)
+                startActivity(intent)
             }
         }
     }
