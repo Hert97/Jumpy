@@ -27,24 +27,12 @@ import com.example.opengl.*
 import com.example.opengl.arcore.BackgroundRenderer
 import com.example.opengl.arcore.PlaneRenderer
 import com.example.opengl.arcore.SpecularCubemapFilter
-import com.google.ar.core.Anchor
-import com.google.ar.core.Camera
-import com.google.ar.core.DepthPoint
-import com.google.ar.core.Frame
-import com.google.ar.core.InstantPlacementPoint
-import com.google.ar.core.LightEstimate
-import com.google.ar.core.Plane
-import com.google.ar.core.Point
-import com.google.ar.core.Session
-import com.google.ar.core.Trackable
-import com.google.ar.core.TrackingFailureReason
-import com.google.ar.core.TrackingState
+import com.google.ar.core.*
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.NotYetAvailableException
 import java.io.IOException
 import java.nio.ByteBuffer
-import java.nio.FloatBuffer
-import java.nio.IntBuffer
+
 
 class JumpyArRenderer(val activity: JumpyActivity) :
   SampleRender.Renderer, DefaultLifecycleObserver {
@@ -130,7 +118,7 @@ class JumpyArRenderer(val activity: JumpyActivity) :
   val displayRotationHelper = DisplayRotationHelper(activity)
   val trackingStateHelper = TrackingStateHelper(activity)
 
-
+  var startLoop : Boolean = false
   override fun onResume(owner: LifecycleOwner) {
     displayRotationHelper.onResume()
     hasSetTextureNames = false
@@ -249,7 +237,6 @@ class JumpyArRenderer(val activity: JumpyActivity) :
     displayRotationHelper.onSurfaceChanged(width, height)
     virtualSceneFramebuffer.resize(width, height)
   }
-
   override fun onDrawFrame(render: SampleRender?) {
     val session = session ?: return
 
@@ -350,7 +337,6 @@ class JumpyArRenderer(val activity: JumpyActivity) :
     }
 
     // -- Draw non-occluded virtual objects (planes, point cloud)
-    //TODO draw a sprite (create a shader for it set mvp matrix as uniform)
 
     // Get projection matrix.
     camera.getProjectionMatrix(projectionMatrix, 0, Z_NEAR, Z_FAR)
@@ -375,13 +361,51 @@ class JumpyArRenderer(val activity: JumpyActivity) :
       projectionMatrix
     )
 
+    if(!startLoop) return
     // -- Draw occluded virtual objects
+    val planeList = session.getAllTrackables<Plane>(Plane::class.java)
+    if( planeList.isNotEmpty()) {
+      val plane = planeList.first()
+      val extents = floatArrayOf(plane.extentX ,0.0f,plane.extentZ )
+      val pose = generateRandomPoseInPlane(plane,extents,10.0f)
+      val cameraPos = camera.pose.translation
+      val res : FloatArray = FloatArray(3)
+      for (i in 0..2) {
+        res[i] = pose!!.translation[i] - cameraPos[i]
+        res[i] *= 1.1f
+      }
+      val hitResultList = frame.hitTest(cameraPos,0,res,0)
+      // Hits are sorted by depth. Consider only closest hit on a plane, Oriented Point, Depth Point,
+      // or Instant Placement Point.
+      val firstHitResult = hitResultList.firstOrNull { hit ->
+          when (val trackable = hit.trackable!!) {
+            is Plane -> trackable.isPoseInPolygon(hit.hitPose) &&
+                        PlaneRenderer.calculateDistanceToPlane(hit.hitPose, camera.pose) > 0
+            is Point -> trackable.orientationMode == Point.OrientationMode.ESTIMATED_SURFACE_NORMAL
+            else -> false
+          }
+        }
+
+      if (firstHitResult != null) {
+        //Log.d("tap","created")
+        // Cap the number of objects created. This avoids overloading both the
+        // rendering system and ARCore.
+        if (wrappedAnchors.size < 10) {
+          wrappedAnchors.add(WrappedAnchor(firstHitResult.createAnchor(), firstHitResult.trackable))
+        }
+
+      }
+
+    }
+
+    //TODO draw a sprite (create a shader for it set mvp matrix as uniform)
 
     // Update lighting parameters in the shader
     updateLightEstimation(frame.lightEstimate, viewMatrix)
 
     // Visualize anchors created by touch.
     render.clear(virtualSceneFramebuffer, 0f, 0f, 0f, 0f)
+
     for ((anchor, trackable) in
       wrappedAnchors.filter { it.anchor.trackingState == TrackingState.TRACKING }) {
       // Get the current pose of an Anchor in world space. The Anchor pose is updated
@@ -410,6 +434,22 @@ class JumpyArRenderer(val activity: JumpyActivity) :
     // Compose the virtual scene with the background.
     backgroundRenderer.drawVirtualScene(render, virtualSceneFramebuffer, Z_NEAR, Z_FAR)
   }
+  private fun generateRandomPoseInPlane(
+    plane: Plane,
+    extents: FloatArray,
+    scaling : Float
+  ): Pose? {
+
+    val translation = FloatArray(3)
+    plane.centerPose.rotateVector(extents)
+    for (i in 0..2) {
+
+      val r = Math.random().toFloat() * 2.0f - 1.0f
+      // Generate a random translation within the plane bounds
+      translation[i] = plane.centerPose.translation[i] + r * extents[i] / 2 * scaling
+    }
+    return Pose.makeTranslation(translation)
+  }
 
   /** Checks if we detected at least one plane. */
   private fun Session.hasTrackingPlane() =
@@ -432,7 +472,6 @@ class JumpyArRenderer(val activity: JumpyActivity) :
     updateSphericalHarmonicsCoefficients(lightEstimate.environmentalHdrAmbientSphericalHarmonics)
     cubemapFilter.update(lightEstimate.acquireEnvironmentalHdrCubeMap())
   }
-
   private fun updateMainLight(
     direction: FloatArray,
     intensity: FloatArray,
@@ -480,7 +519,10 @@ class JumpyArRenderer(val activity: JumpyActivity) :
     if (camera.trackingState != TrackingState.TRACKING) return
     val tap = activity.view.tapHelper.poll() ?: return
 
-    val hitResultList =
+    // temp confirmation to start game after detectiong and setup ground plane
+    // TODO create a confirmation button
+    startLoop = true
+    /*val hitResultList =
       if (activity.instantPlacementSettings.isInstantPlacementEnabled()) {
         frame.hitTestInstantPlacement(tap.x, tap.y, APPROXIMATE_DISTANCE_METERS)
       } else {
@@ -519,7 +561,7 @@ class JumpyArRenderer(val activity: JumpyActivity) :
       // For devices that support the Depth API, shows a dialog to suggest enabling
       // depth-based occlusion. This dialog needs to be spawned on the UI thread.
       activity.runOnUiThread { activity.view.showOcclusionDialogIfNeeded() }
-    }
+    }*/
   }
 
   private fun showError(errorMessage: String) =

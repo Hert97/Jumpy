@@ -66,8 +66,9 @@ class SampleRender constructor(
         glSurfaceView.setWillNotDraw(false)
 
 
-        val indices = intArrayOf(0, 1, 2, 2, 3,0)
-        val vertexIndices: IntBuffer = IntBuffer.wrap(indices)
+        /*val indices = intArrayOf(0, 1, 2, 2, 3,0)
+        val vertexIndices: IntBuffer = IntBuffer.allocate(6)
+        vertexIndices.put(indices)
 
         val vertex = floatArrayOf(
             -0.5f, -0.5f, 0.0f,   // bottom left
@@ -75,7 +76,8 @@ class SampleRender constructor(
             0.5f,  0.5f, 0.0f,  // top right
             -0.5f,  0.5f, 0.0f)    // top left
 
-        val positions : FloatBuffer = FloatBuffer.wrap(vertex)
+        val positions : FloatBuffer = FloatBuffer.allocate(4 * 3)
+        positions.put(vertex)
 
         val uv = floatArrayOf(
             0.0f, 0.0f,  // bottom left
@@ -83,7 +85,8 @@ class SampleRender constructor(
             1.0f, 1.0f, // top right
             0.0f, 1.0f  // top left
         )
-        val uvs: FloatBuffer = FloatBuffer.wrap(uv)
+        val uvs: FloatBuffer = FloatBuffer.allocate(4 *2)
+        uvs.put(uv)
         //val normals: FloatBuffer = ObjData.getNormals(obj)
         val vertexBuffers: Array<VertexBuffer> = arrayOf(
             VertexBuffer(this, 3, positions),
@@ -91,7 +94,7 @@ class SampleRender constructor(
             //(render, 3, normals)
         )
         val indexBuffer = IndexBuffer(this, vertexIndices)
-        quadMesh = Mesh(this, Mesh.PrimitiveMode.TRIANGLES, indexBuffer, vertexBuffers)
+        quadMesh = Mesh(this, Mesh.PrimitiveMode.TRIANGLES, indexBuffer, vertexBuffers)*/
     }
     /**
      * Draw a [Mesh] with the specified [Shader] to the given [Framebuffer].
