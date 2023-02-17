@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import com.example.JumpyActivity
+//import com.example.JumpyActivity
 import com.example.jumpy.R
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
@@ -25,7 +25,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(view: View) {
         when (view.id) {
             R.id.button_play -> {
-                val intent = Intent(this, JumpyActivity::class.java)
+                val intent = Intent(this, FaceRegionsActivity::class.java)
+//                val intent = Intent(this, JumpyActivity::class.java)
                 startActivity(intent)
             }
             R.id.button_exit -> {
