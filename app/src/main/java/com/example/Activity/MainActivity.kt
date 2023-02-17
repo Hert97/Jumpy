@@ -1,10 +1,16 @@
 package com.example.Activity
 
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.graphics.drawable.AnimationDrawable
+import android.graphics.drawable.BitmapDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
+import com.example.Animator
+import com.example.Spritesheet
 //import com.example.JumpyActivity
 import com.example.jumpy.R
 
@@ -20,6 +26,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         buttonPlay.setOnClickListener(this)
         buttonExit.setOnClickListener(this)
         buttonCredit.setOnClickListener(this)
+
+        val catImageView : ImageView = findViewById(R.id.mm_image_1)
+
+//        val context = this
+//        val resources = context.resources
+//        val drawableId = R.drawable.animation
+//
+//        val animDrawable = ResourcesCompat.getDrawable(resources, drawableId, null) as AnimationDrawable
+//        catImageView.setImageDrawable(animDrawable)
+//        animDrawable.start()
+
+        val FRAME_DURATION = 200
+        val spriteSheet = BitmapFactory.decodeResource(resources, R.drawable.idle)
+        val frames = Spritesheet.slice(spriteSheet, 1, 3)
+        val anime = Animator(catImageView, resources, frames, FRAME_DURATION)
+        anime.start()
     }
 
     override fun onClick(view: View) {
