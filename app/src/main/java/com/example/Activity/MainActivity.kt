@@ -54,8 +54,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 startActivity(intent)
             }
             R.id.button_exit -> {
-//                finish()
-                anime.stop()
+                finish()
             }
             R.id.button_credit -> {
                 val intent = Intent(this, CreditActivity::class.java)
