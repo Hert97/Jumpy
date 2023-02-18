@@ -14,6 +14,7 @@ import com.example.Spritesheet
 //import com.example.JumpyActivity
 import com.example.jumpy.R
 
+lateinit var anime : Animator
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,10 +38,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 //        catImageView.setImageDrawable(animDrawable)
 //        animDrawable.start()
 
-        val FRAME_DURATION = 200
+        val FRAME_DURATION = 1 //seconds
         val spriteSheet = BitmapFactory.decodeResource(resources, R.drawable.idle)
         val frames = Spritesheet.slice(spriteSheet, 1, 3)
-        val anime = Animator(catImageView, resources, frames, FRAME_DURATION)
+        anime = Animator(catImageView, resources, frames, FRAME_DURATION)
+//        val anime = Animator(catImageView, resources, frames, null)
         anime.start()
     }
 
@@ -52,7 +54,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 startActivity(intent)
             }
             R.id.button_exit -> {
-                finish()
+//                finish()
+                anime.stop()
             }
             R.id.button_credit -> {
                 val intent = Intent(this, CreditActivity::class.java)
