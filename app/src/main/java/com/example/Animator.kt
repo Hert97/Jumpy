@@ -28,19 +28,18 @@ class Animator {
     private val anime: AnimationDrawable
     private var isPlaying: Boolean = false
     private var isLooping: Boolean = false
-    private var enterFadeDuration: Int = 0
-    private var exitFadeDuration: Int = 0
+    private var enterFadeDuration: Float = 0f
+    private var exitFadeDuration: Float = 0f
 
     constructor(
-        displayImage: ImageView, //The image view to display the animation on
         resources: Resources, //needa pass the resources from the activity classes to here
         sprites: List<Bitmap>, //List of images
-        frameDuration: Int? //In Seconds. If "null", default frame duration will be used
+        frameDuration: Float? //In Seconds. If "null", default frame duration will be used
     ) {
         // If "null" is passed in for frameDuration parameter,
         // default frameduration of 200 will be used
         var fDuration = 200 // 0.2 seconds
-        if (frameDuration != null) fDuration = frameDuration * 1000
+        if (frameDuration != null) fDuration = (frameDuration * 1000f).toInt()
 
         anime = AnimationDrawable()
         sprites.forEach { bitmap ->
@@ -48,6 +47,11 @@ class Animator {
                 anime.addFrame(BitmapDrawable(resources, bitmap), fDuration)
             }
         }
+    }
+
+    fun setImageView(
+        displayImage: ImageView, //The image view to display the animation on
+    ) {
         displayImage.setImageDrawable(anime)
     }
 
@@ -66,16 +70,23 @@ class Animator {
         isLooping = flag
     }
 
-    fun setEnterFadeDuration(duration: Int) {
-        anime.setEnterFadeDuration(duration)
+    fun setEnterFadeDuration(duration: Float) {
+        val msDuration = (duration * 1000f).toInt()
+        anime.setEnterFadeDuration(msDuration)
         enterFadeDuration = duration
     }
 
-    fun setExitFadeDuration(duration: Int) {
-        anime.setExitFadeDuration(duration)
+    fun setExitFadeDuration(duration: Float) {
+        val msDuration = (duration * 1000f).toInt()
+        anime.setExitFadeDuration(msDuration)
         exitFadeDuration = duration
     }
 
+
+    fun getAnime() : AnimationDrawable
+    {
+        return anime
+    }
 
     fun isPlaying(): Boolean {
         return isPlaying
@@ -85,11 +96,11 @@ class Animator {
         return isLooping
     }
 
-    fun getEnterFadeDuration(): Int {
+    fun getEnterFadeDuration(): Float {
         return enterFadeDuration
     }
 
-    fun getExitFadeDuration(): Int {
+    fun getExitFadeDuration(): Float {
         return exitFadeDuration
     }
 }

@@ -25,7 +25,7 @@
       android:layout_height="fill_parent"
       android:layout_gravity="top"/>
 
-  <TextView
+  <!--TextView
       android:id="@+id/score"
       android:layout_width="match_parent"
       android:layout_height="104dp"
@@ -48,6 +48,6 @@
       android:layout_marginEnd="25dp"
       android:layout_marginBottom="25dp"
       android:background="@android:color/transparent"
-      android:src="@drawable/ic_settings" />
+      android:src="@drawable/ic_settings" /-->
 
 </RelativeLayout>

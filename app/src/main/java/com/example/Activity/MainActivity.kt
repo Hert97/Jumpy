@@ -14,8 +14,9 @@ import com.example.Spritesheet
 //import com.example.JumpyActivity
 import com.example.jumpy.R
 
-lateinit var anime : Animator
 class MainActivity : AppCompatActivity(), View.OnClickListener {
+
+    lateinit var anime : Animator
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_menu)
@@ -38,11 +39,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 //        catImageView.setImageDrawable(animDrawable)
 //        animDrawable.start()
 
-        val FRAME_DURATION = 1 //seconds
+        val FRAME_DURATION = 1f //seconds
         val spriteSheet = BitmapFactory.decodeResource(resources, R.drawable.idle)
         val frames = Spritesheet.slice(spriteSheet, 1, 3)
-        anime = Animator(catImageView, resources, frames, FRAME_DURATION)
+        anime = Animator(resources, frames, FRAME_DURATION)
 //        val anime = Animator(catImageView, resources, frames, null)
+        anime.setImageView(catImageView)
         anime.start()
     }
 

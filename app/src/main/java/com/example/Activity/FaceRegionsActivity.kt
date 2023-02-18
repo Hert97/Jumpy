@@ -2,10 +2,14 @@ package com.example.Activity
 
 import android.app.ActivityManager
 import android.content.Context
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import com.example.FaceArFragment
 import com.example.FilterFace
 import com.example.jumpy.R
@@ -30,7 +34,7 @@ class FaceRegionsActivity : AppCompatActivity() {
             return
         }
 
-        setContentView(R.layout.activity_regions)
+        setContentView(R.layout.activity_ui)
         arFragment = supportFragmentManager.findFragmentById(R.id.face_fragment) as FaceArFragment
 
         val sceneView = arFragment.arSceneView
@@ -63,7 +67,7 @@ class FaceRegionsActivity : AppCompatActivity() {
                 }
         }
 
-        findViewById<ImageButton>(R.id.button_refresh).setOnClickListener {
+        findViewById<ImageButton>(R.id.settings_button).setOnClickListener {
             if (!refresh) {
                 startQuiz()
             } else {
