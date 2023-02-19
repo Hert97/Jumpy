@@ -2,31 +2,32 @@ package com.example.Activity
 
 import android.app.ActivityManager
 import android.content.Context
-import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.util.TypedValue
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
 import com.example.FaceArFragment
 import com.example.FilterFace
+import com.example.FishObject
 import com.example.jumpy.R
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.AugmentedFace
 import com.google.ar.core.TrackingState
+import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
+import kotlin.properties.Delegates
 
 
-class FaceRegionsActivity : AppCompatActivity() {
+class GameActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
     }
 
     lateinit var arFragment: FaceArFragment
+    var spawnPosY = 0.0f
+    var spawnPosZ by Delegates.notNull<Float>()
     var faceNodeMap = HashMap<AugmentedFace, FilterFace>()
-    var refresh: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +42,6 @@ class FaceRegionsActivity : AppCompatActivity() {
         sceneView.cameraStreamRenderPriority = Renderable.RENDER_PRIORITY_FIRST
         val scene = sceneView.scene
 
-        //Update loop
         scene.addOnUpdateListener {
             /* Ensuring that there is only 1 face being tracked at a time*/
             sceneView.session
@@ -68,24 +68,30 @@ class FaceRegionsActivity : AppCompatActivity() {
         }
 
         findViewById<ImageButton>(R.id.settings_button).setOnClickListener {
-            if (!refresh) {
-                startQuiz()
-            } else {
-                refresh()
-            }
-            refresh = !refresh
+            //Restart Button
+            //Back to main menu Button
         }
+
+
+        /*============================== Game logic ==============================*/
+        val outValue = TypedValue()
+        resources.getValue(R.dimen.gamePosZ, outValue, true)
+        spawnPosZ = outValue.float
+
+        spawnFishes(100)
     }
 
-    private fun startQuiz() {
-        for (face in faceNodeMap.values) {
-            face.animate()
-        }
+    private fun randomPosition(): Vector3 {
+        val x = (Math.random() * 0.5 - 0.25).toFloat()
+        return Vector3(x, spawnPosY, spawnPosZ)
     }
 
-    private fun refresh() {
-        for (face in faceNodeMap.values) {
-            face.refresh()
+    private fun spawnFishes(numObjects: Int)
+    {
+        for (i in 0 until numObjects) {
+            val position = randomPosition()
+            val imageView = FishObject(this, position)
+            imageView.setParent(arFragment.arSceneView.scene)
         }
     }
 
