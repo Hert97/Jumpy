@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import android.util.TypedValue
 import android.widget.ImageView
+import com.example.Activity.Global
 import com.google.ar.core.AugmentedFace
 import com.google.ar.sceneform.FrameTime
 import com.google.ar.sceneform.Node
@@ -14,21 +15,16 @@ import com.google.ar.sceneform.ux.AugmentedFaceNode
 import com.example.jumpy.R
 import kotlin.properties.Delegates
 
-class FilterFace(
+class CatFace(
     augmentedFace: AugmentedFace?,
-    val context: Context
+    val context: Context,
 ) : AugmentedFaceNode(augmentedFace) {
 
     private var characterNode: Node? = null
-    var spawnPosZ by Delegates.notNull<Float>()
 
     private lateinit var anime: Animator
     override fun onActivate() {
         super.onActivate()
-
-        val outValue = TypedValue()
-        context.resources.getValue(R.dimen.gamePosZ, outValue, true)
-        spawnPosZ = outValue.float
 
         val FRAME_DURATION = 0.2f //seconds
         val spriteSheet = BitmapFactory.decodeResource(context.resources, R.drawable.idle)
@@ -56,7 +52,7 @@ class FilterFace(
                 anime.start()
             }
             .exceptionally { throwable: Throwable? ->
-                Log.e("FilterFace", "Could not create ui element", throwable)
+                Log.e("CatFace", "Could not create ui element", throwable)
                 null
             }
     }
@@ -65,7 +61,8 @@ class FilterFace(
         super.onUpdate(frameTime)
         augmentedFace?.let { face ->
             val nose = face.getRegionPose(AugmentedFace.RegionType.NOSE_TIP)
-            characterNode?.worldPosition = Vector3(nose.tx(), nose.ty(), spawnPosZ)
+            Global.spawnPosZ = nose.tz()
+            characterNode?.worldPosition = Vector3(nose.tx(), nose.ty(), Global.spawnPosZ)
         }
 
         // Update the ImageView to show the current frame of the animation

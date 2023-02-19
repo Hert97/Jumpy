@@ -3,12 +3,15 @@ package com.example.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.util.TypedValue
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.FaceArFragment
-import com.example.FilterFace
+import com.example.CatFace
 import com.example.FishObject
 import com.example.jumpy.R
 import com.google.ar.core.ArCoreApk
@@ -16,18 +19,24 @@ import com.google.ar.core.AugmentedFace
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
-import kotlin.properties.Delegates
 
+object Global {
+    var spawnPosZ = 0f
+    var numFishesOnScreen = 0
+}
 
 class GameActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
+        const val SPAWN_DELAY_MS = 2000L //2 seconds
+        const val MAX_FISHES_ON_SCREEN = 20
     }
 
     lateinit var arFragment: FaceArFragment
-    var spawnPosY = 0.0f
-    var spawnPosZ by Delegates.notNull<Float>()
-    var faceNodeMap = HashMap<AugmentedFace, FilterFace>()
+    var spawnPosY = 0f
+    var faceNodeMap = HashMap<AugmentedFace, CatFace>()
+    private val handler = Handler(Looper.getMainLooper())
+    private var isSpawningFishes = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +57,7 @@ class GameActivity : AppCompatActivity() {
                 ?.getAllTrackables(AugmentedFace::class.java)?.let {
                     for (f in it) {
                         if (!faceNodeMap.containsKey(f)) {
-                            val faceNode = FilterFace(f, this)
+                            val faceNode = CatFace(f, this)
                             faceNode.setParent(scene)
                             faceNodeMap.put(f, faceNode)
                         }
@@ -76,32 +85,62 @@ class GameActivity : AppCompatActivity() {
         /*============================== Game logic ==============================*/
         val outValue = TypedValue()
         resources.getValue(R.dimen.gamePosZ, outValue, true)
-        spawnPosZ = outValue.float
+        Global.spawnPosZ = outValue.float
 
-        spawnFishes(100)
+//        startSpawningFishes()
+        spawnFishes(1)
     }
 
     private fun randomPosition(): Vector3 {
-        val x = (Math.random() * 0.5 - 0.25).toFloat()
-        return Vector3(x, spawnPosY, spawnPosZ)
+        val minX = -0.05f
+        val maxX = 0.05f
+        val x = (Math.random() * (maxX - minX) + minX).toFloat()
+        return Vector3(x, spawnPosY, Global.spawnPosZ)
     }
 
-    private fun spawnFishes(numObjects: Int)
-    {
+    private fun startSpawningFishes() {
+        isSpawningFishes = true
+        handler.postDelayed(object : Runnable {
+            override fun run() {
+                if (isSpawningFishes) {
+                    spawnFishes(3)
+                    handler.postDelayed(this, SPAWN_DELAY_MS)
+                }
+            }
+        }, SPAWN_DELAY_MS)
+    }
+
+    private fun stopSpawningFishes() {
+        isSpawningFishes = false
+    }
+
+    private fun spawnFishes(numObjects: Int) {
         for (i in 0 until numObjects) {
-            val position = randomPosition()
-            val imageView = FishObject(this, position)
-            imageView.setParent(arFragment.arSceneView.scene)
+
+            if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
+                val position = randomPosition()
+                val imageView = FishObject(this, position,"Fish", arFragment.arSceneView.scene)
+                imageView.Setup()
+                imageView.setParent(arFragment.arSceneView.scene)
+
+                Global.numFishesOnScreen++
+                Log.d(
+                    "MainActivity",
+                    "Fish added to screen. numFishesOnScreen = ${Global.numFishesOnScreen}"
+                )
+            }
         }
     }
 
-    private fun checkIsSupportedDeviceOrFinish() : Boolean {
-        if (ArCoreApk.getInstance().checkAvailability(this) == ArCoreApk.Availability.UNSUPPORTED_DEVICE_NOT_CAPABLE) {
+    private fun checkIsSupportedDeviceOrFinish(): Boolean {
+        if (ArCoreApk.getInstance()
+                .checkAvailability(this) == ArCoreApk.Availability.UNSUPPORTED_DEVICE_NOT_CAPABLE
+        ) {
             Toast.makeText(this, "Augmented Faces requires ARCore", Toast.LENGTH_LONG).show()
             finish()
             return false
         }
-        val openGlVersionString =  (getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager)
+        val openGlVersionString = (getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager)
             ?.deviceConfigurationInfo
             ?.glEsVersion
 
