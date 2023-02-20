@@ -25,6 +25,8 @@ object Global {
     var spawnPosZ = 0f
     var numFishesOnScreen = 0
     var currCatFace : Node? = null
+    var catWidth = 1f
+    var catHeight = 1f
 }
 
 class GameActivity : AppCompatActivity() {
@@ -90,8 +92,8 @@ class GameActivity : AppCompatActivity() {
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
 
- //     startSpawningFishes()
-        spawnFishes(1)
+      startSpawningFishes()
+        //spawnFishes(1)
     }
 
     private fun randomPosition(): Vector3 {
@@ -125,7 +127,7 @@ class GameActivity : AppCompatActivity() {
 
             if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
                 val position = randomPosition()
-                val imageView = FishObject(this, position)
+                val imageView = FishObject(this, position, arFragment.arSceneView.scene)
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)
 

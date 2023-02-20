@@ -11,12 +11,12 @@ import com.example.jumpy.R
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.math.Vector3
-import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.ViewRenderable
-import com.google.ar.sceneform.collision.Box
+//import com.google.ar.sceneform.math.Matrix
+import android.opengl.Matrix
 
 
-class FishObject(context: Context, position: Vector3) : Node() {
+class FishObject(context: Context, position: Vector3, scene: Scene) : Node() {
 
     companion object {
         const val basePosY = -0.4f
@@ -88,20 +88,20 @@ class FishObject(context: Context, position: Vector3) : Node() {
         //Check collision
         if(Global.currCatFace != null)
         {
-            var objectAABB = AABB(worldPosition,1f, 1f)
+            var objectAABB = AABB(worldToScreenCoordinates(scene!!,worldPosition), fishWidth.toFloat(), fishHeight.toFloat())
             var catAABB = AABB(
-                Global.currCatFace!!.worldPosition,
-                1f,
-                1f
+                worldToScreenCoordinates(scene!!, Global.currCatFace!!.worldPosition),
+                Global.catWidth,
+                Global.catHeight
             )
-            Log.d("FishObject", "objectAABB = ${objectAABB.min.x}, ${objectAABB.min.y}, ${objectAABB.max.x}, ${objectAABB.max.y} ")
-            Log.d("FishObject", "catAABB = ${catAABB.min.x}, ${catAABB.min.y}, ${catAABB.max.x}, ${catAABB.max.y}")
-
-            Log.d("FishObject", "objectWorldPos = ${worldPosition.x},${worldPosition.y},${worldPosition.z}")
-            Log.d("FishObject", "catWorldPos = ${Global.currCatFace!!.worldPosition.x},${Global.currCatFace!!.worldPosition.y},${Global.currCatFace!!.worldPosition.z}")
-
-            Log.d("FishObject", "objectLocalPos = ${localPosition.x},${localPosition.y},${localPosition.z}")
-            Log.d("FishObject", "catLocalPos = ${Global.currCatFace!!.localPosition.x},${Global.currCatFace!!.localPosition.y},${Global.currCatFace!!.localPosition.z}")
+//            Log.d("FishObject", "objectAABB = ${objectAABB.min.x}, ${objectAABB.min.y}, ${objectAABB.max.x}, ${objectAABB.max.y} ")
+//            Log.d("FishObject", "catAABB = ${catAABB.min.x}, ${catAABB.min.y}, ${catAABB.max.x}, ${catAABB.max.y}")
+//
+//            Log.d("FishObject", "objectWorldPos = ${worldPosition.x},${worldPosition.y},${worldPosition.z}")
+//            Log.d("FishObject", "catWorldPos = ${Global.currCatFace!!.worldPosition.x},${Global.currCatFace!!.worldPosition.y},${Global.currCatFace!!.worldPosition.z}")
+//
+//            Log.d("FishObject", "objectLocalPos = ${localPosition.x},${localPosition.y},${localPosition.z}")
+//            Log.d("FishObject", "catLocalPos = ${Global.currCatFace!!.localPosition.x},${Global.currCatFace!!.localPosition.y},${Global.currCatFace!!.localPosition.z}")
 
             if (objectAABB.intersects(catAABB)) {
                 Log.d(
@@ -139,5 +139,29 @@ class FishObject(context: Context, position: Vector3) : Node() {
         flag = true
         if (parent == null)
             Log.d("success", "remove liao")
+    }
+
+    fun worldToScreenCoordinates(scene: Scene, worldPos: Vector3): Vector3 {
+        val viewProjectionMatrix = FloatArray(16)
+        val cam = scene.camera
+
+        Matrix.multiplyMM(viewProjectionMatrix, 0, cam.viewMatrix.data, 0, cam.projectionMatrix.data, 0)
+        val worldPosHomogeneous = floatArrayOf(worldPos.x, worldPos.y, worldPos.z, 1.0f)
+
+        val clipPos = FloatArray(4)
+        Matrix.multiplyMV(clipPos, 0, viewProjectionMatrix, 0, worldPosHomogeneous, 0)
+        val ndcPos = Vector3(clipPos[0], clipPos[1], clipPos[2])
+        if(clipPos[3] != 0.0f)
+        {
+            ndcPos.scaled(1f/clipPos[3])
+        }
+        val screenWidth = scene.view.width.toFloat()
+        val screenHeight = scene.view.height.toFloat()
+        val screenPos = Vector3(
+            ((ndcPos.x + 1) / 2) * screenWidth,
+            ((1 - ndcPos.y) / 2) * screenHeight,
+            ndcPos.z
+        )
+        return screenPos
     }
 }
