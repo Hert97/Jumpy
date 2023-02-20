@@ -19,16 +19,32 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
-            android:name="com.example.JumpyActivity"
+            android:name="com.example.Activity.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!--            android:name="com.example.JumpyActivity"-->
+        <activity
+            android:name="com.example.Activity.GameActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.NoActionBar"
-            android:screenOrientation="locked">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name="com.example.Activity.CreditActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:screenOrientation="portrait">
+        </activity>
+
         <!-- Indicates whether "Google Play Services for AR" (ARCore) is "required" or "optional". -->
         <meta-data android:name="com.google.ar.core" android:value="required" />
     </application>

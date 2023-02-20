@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView_phillip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="95dp"
+        android:layout_marginTop="178dp"
+        android:text="Phillip"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_yiguan" />
+
+    <TextView
+        android:id="@+id/textView_minyi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="267dp"
+        android:layout_marginTop="197dp"
+        android:text="Min Yi"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_yiguan" />
+
+    <TextView
+        android:id="@+id/textView_yiguan"
+        android:layout_width="352dp"
+        android:layout_height="133dp"
+        android:layout_marginStart="29dp"
+        android:layout_marginTop="92dp"
+        android:layout_marginEnd="30dp"
+        android:gravity="center"
+        android:text="Yi Guan"
+        android:textSize="100sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_Edwin"
+        android:layout_width="50dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="61dp"
+        android:layout_marginTop="141dp"
+        android:gravity="center"
+        android:text="Edwin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_phillip" />
+
+    <TextView
+        android:id="@+id/textView_Syaakir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="241dp"
+        android:layout_marginTop="63dp"
+        android:text="Syaakir"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_minyi" />
+</androidx.constraintlayout.widget.ConstraintLayout>
