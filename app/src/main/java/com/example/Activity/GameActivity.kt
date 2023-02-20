@@ -33,7 +33,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     lateinit var arFragment: FaceArFragment
-    var spawnPosY = 0.15f
+    var spawnPosY = 0.1f
     var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
     private var isSpawningFishes = true
@@ -122,7 +122,7 @@ class GameActivity : AppCompatActivity() {
 
             if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
                 val position = randomPosition()
-                val imageView = FishObject(this, position,"Fish", arFragment.arSceneView.scene)
+                val imageView = FishObject(this, position)
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)
 

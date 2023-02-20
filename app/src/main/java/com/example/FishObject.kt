@@ -13,10 +13,9 @@ import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ViewRenderable
 
-class FishObject(context: Context, position: Vector3, name: String, scene: Scene) : Node() {
+class FishObject(context: Context, position: Vector3) : Node() {
 
-    companion object
-    {
+    companion object {
         const val basePosY = -0.4f
     }
 
@@ -25,16 +24,10 @@ class FishObject(context: Context, position: Vector3, name: String, scene: Scene
     private var fishImageView: ImageView
     private var mContext: Context
 
-    //testing
-    private var mName: String
-    private var mScene: Scene
 
     init {
         localPosition = position
         mContext = context
-
-        mName = name
-        mScene = scene
 
         fishImageView = ImageView(context)
         fishImageView.setImageResource(R.drawable.fish)
@@ -46,16 +39,15 @@ class FishObject(context: Context, position: Vector3, name: String, scene: Scene
         val screenWidth = displayMetrics.widthPixels
 
         // Set layout parameters of ImageView
-        val widthInPercentage = 5 // in %, e.g.5%
-        val heightInPercentage = 5 // in %, e.g.5%
+        val widthInPercentage = 4 // in %, e.g.5%
+        val heightInPercentage = 4 // in %, e.g.5%
         val layoutParams = ConstraintLayout.LayoutParams(
             screenWidth * widthInPercentage / 100,
             screenHeight * heightInPercentage / 100
         )
         fishImageView.layoutParams = layoutParams
-
-        val minGravity = -0.0001f // Minimum gravity value
-        val maxGravity = -0.001f // Maximum gravity value
+        val minGravity = -0.05f // Minimum gravity value
+        val maxGravity = -0.1f // Maximum gravity value
         gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
     }
 
@@ -69,7 +61,6 @@ class FishObject(context: Context, position: Vector3, name: String, scene: Scene
                 Log.e("Fish Object", "Unable to load renderable", throwable)
                 null
             }
-        mName = "cat"
     }
 
     var flag: Boolean = false
@@ -95,7 +86,6 @@ class FishObject(context: Context, position: Vector3, name: String, scene: Scene
             onDeactivate()
             parent?.removeChild(this) //remove this node from the parent "arscene"
 
-            //scene?.removeOnUpdateListener()
             flag = true
             if (parent == null)
                 Log.d("success", "remove liao")

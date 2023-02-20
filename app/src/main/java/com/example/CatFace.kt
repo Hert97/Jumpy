@@ -61,7 +61,7 @@ class CatFace(
         super.onUpdate(frameTime)
         augmentedFace?.let { face ->
             val nose = face.getRegionPose(AugmentedFace.RegionType.NOSE_TIP)
-            Global.spawnPosZ = nose.tz()
+            //Global.spawnPosZ = nose.tz()
             characterNode?.worldPosition = Vector3(nose.tx(), nose.ty(), Global.spawnPosZ)
         }
 
