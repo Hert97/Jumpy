@@ -15,9 +15,14 @@ import com.google.ar.sceneform.rendering.ViewRenderable
 
 class FishObject(context: Context, position: Vector3, name: String, scene: Scene) : Node() {
 
+    companion object
+    {
+        const val basePosY = -0.4f
+    }
+
     private var gravity = 0f // gravity acceleration in m/s^2
     private var velocity = 0f
-    private var fishImageView : ImageView
+    private var fishImageView: ImageView
     private var mContext: Context
 
     //testing
@@ -43,7 +48,10 @@ class FishObject(context: Context, position: Vector3, name: String, scene: Scene
         // Set layout parameters of ImageView
         val widthInPercentage = 5 // in %, e.g.5%
         val heightInPercentage = 5 // in %, e.g.5%
-        val layoutParams = ConstraintLayout.LayoutParams(screenWidth * widthInPercentage / 100, screenHeight * heightInPercentage / 100)
+        val layoutParams = ConstraintLayout.LayoutParams(
+            screenWidth * widthInPercentage / 100,
+            screenHeight * heightInPercentage / 100
+        )
         fishImageView.layoutParams = layoutParams
 
         val minGravity = -0.0001f // Minimum gravity value
@@ -51,8 +59,7 @@ class FishObject(context: Context, position: Vector3, name: String, scene: Scene
         gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
     }
 
-    fun Setup()
-    {// Need to call this after creating the fish object
+    fun Setup() {// Need to call this after creating the fish object
         // Build view renderable
         ViewRenderable.builder()
             .setView(mContext, fishImageView)
@@ -65,33 +72,33 @@ class FishObject(context: Context, position: Vector3, name: String, scene: Scene
         mName = "cat"
     }
 
+    var flag: Boolean = false
     override fun onUpdate(frameTime: com.google.ar.sceneform.FrameTime?) {
         super.onUpdate(frameTime)
-        if(parent == null)
-            setParent(mScene) //TODO: internally parent is already set, but once it enter this onUpdate function, parent always null
+        if (flag)
+            return
 
-        if(parent != null)
-        {
-            // update the position by applying gravity
-            val dt = frameTime?.deltaSeconds ?: 0f
-            velocity += gravity * dt
-            val pos = localPosition
-            localPosition = Vector3(pos.x, pos.y + velocity * dt, Global.spawnPosZ)
+        // update the position by applying gravity
+        val dt = frameTime?.deltaSeconds ?: 0f
+        velocity += gravity * dt
+        val pos = localPosition
+        localPosition = Vector3(pos.x, pos.y + velocity * dt, Global.spawnPosZ)
 
-            // check if the fish is below the ground plane and remove it
-            if (pos.y < 0) {
-                Global.numFishesOnScreen--
-                Log.d("FishObject", "Fish removed from screen. numFishesOnScreen = ${Global.numFishesOnScreen}")
+        // check if the fish is below the ground plane and remove it
+        if (pos.y < basePosY) {
+            Global.numFishesOnScreen--
+            Log.d(
+                "FishObject",
+                "Fish removed from screen. numFishesOnScreen = ${Global.numFishesOnScreen}"
+            )
 
-                // Perform cleanup operations
-                fishImageView.setImageDrawable(null)
-                fishImageView.setImageBitmap(null)
-                // Call super method
-                super.onDeactivate()
-               // parent?.removeChild(this)
-                if(parent == null)
-                    Log.d("success", "remove liao")
-            }
+            onDeactivate()
+            parent?.removeChild(this) //remove this node from the parent "arscene"
+
+            //scene?.removeOnUpdateListener()
+            flag = true
+            if (parent == null)
+                Log.d("success", "remove liao")
         }
     }
 

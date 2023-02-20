@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
 import android.widget.ImageButton
@@ -14,11 +15,10 @@ import com.example.FaceArFragment
 import com.example.CatFace
 import com.example.FishObject
 import com.example.jumpy.R
-import com.google.ar.core.ArCoreApk
-import com.google.ar.core.AugmentedFace
-import com.google.ar.core.TrackingState
+import com.google.ar.core.*
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
+import kotlin.math.atan
 
 object Global {
     var spawnPosZ = 0f
@@ -33,7 +33,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     lateinit var arFragment: FaceArFragment
-    var spawnPosY = 0f
+    var spawnPosY = 0.15f
     var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
     private var isSpawningFishes = true
@@ -87,15 +87,18 @@ class GameActivity : AppCompatActivity() {
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
 
-//        startSpawningFishes()
-        spawnFishes(1)
+       startSpawningFishes()
+       //spawnFishes(1)
     }
 
     private fun randomPosition(): Vector3 {
         val minX = -0.05f
         val maxX = 0.05f
         val x = (Math.random() * (maxX - minX) + minX).toFloat()
-        return Vector3(x, spawnPosY, Global.spawnPosZ)
+
+        val y  = spawnPosY //arFragment.arSceneView.arFrame?.camera?.pose?.ty()?.minus(0.5f)?: 0.0f
+        Log.d("pos y", y.toString())
+        return Vector3(x, y, Global.spawnPosZ)
     }
 
     private fun startSpawningFishes() {
@@ -130,6 +133,65 @@ class GameActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    private fun getScreenPosY() : Float?
+    {
+        val display = windowManager.defaultDisplay
+        val displayMetrics = DisplayMetrics()
+        display.getRealMetrics(displayMetrics)
+
+        val screenWidth = displayMetrics.widthPixels
+        val screenHeight = displayMetrics.heightPixels
+
+        val screenAspectRatio = screenHeight.toFloat() / screenWidth.toFloat()
+
+        val frame = arFragment.arSceneView.arFrame
+        val camera = frame?.camera
+        val intrinsics = camera?.imageIntrinsics
+
+        val focalLength = intrinsics?.focalLength!![1]
+        val verticalFov = 2.0 * atan(0.5 * intrinsics?.imageDimensions!![1].toDouble() / focalLength)
+
+// Compute the distance from the camera to the screen center
+        val distance = screenHeight / (2 * Math.tan(Math.toRadians(verticalFov) / 2))
+
+// Compute the world position of the four corners of the screen
+        val pos : FloatArray = FloatArray(3)
+        val topLeft =
+            camera.displayOrientedPose?.compose(Pose.makeTranslation((-screenWidth/2).toFloat(), (-screenHeight/2).toFloat() / screenAspectRatio,
+                (-distance).toFloat()
+            ))?.extractTranslation()?.getTranslation(pos, 0)
+
+       val outPos = worldToCameraSpace(Vector3(pos[0], pos[1], pos[2]), camera)
+
+       return outPos.y
+
+    }
+
+    fun worldToCameraSpace(worldPosition: Vector3, camera: Camera): Vector3 {
+        // Step 1'
+        val cameraPosition = arFragment.arSceneView.scene.camera.worldPosition
+
+        // Step 2
+        val cameraForward = Vector3.subtract(worldPosition, cameraPosition)
+            .normalized()
+
+        // Step 3
+        val cameraUp = Vector3.up()
+
+        // Step 4
+        val cameraRight = Vector3.cross(cameraForward, cameraUp)
+
+        // Step 5
+        val worldPositionToConvert = Vector3.subtract(worldPosition, cameraPosition)
+
+        // Step 6
+        val x = Vector3.dot(worldPositionToConvert, cameraRight)
+        val y = Vector3.dot(worldPositionToConvert, cameraUp)
+        val z = Vector3.dot(worldPositionToConvert, cameraForward)
+
+        return Vector3(x, y, z)
     }
 
     private fun checkIsSupportedDeviceOrFinish(): Boolean {
