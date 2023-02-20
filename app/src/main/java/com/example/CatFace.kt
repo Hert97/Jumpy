@@ -15,14 +15,15 @@ import com.google.ar.sceneform.ux.AugmentedFaceNode
 import com.example.jumpy.R
 import kotlin.properties.Delegates
 
-class CatFace(
+class  CatFace(
     augmentedFace: AugmentedFace?,
     val context: Context,
 ) : AugmentedFaceNode(augmentedFace) {
 
-    private var characterNode: Node? = null
+    var characterNode: Node? = null
 
     private lateinit var anime: Animator
+    private lateinit var characterIV : ImageView
     override fun onActivate() {
         super.onActivate()
 
@@ -33,7 +34,6 @@ class CatFace(
 
         characterNode = Node()
         characterNode?.setParent(this)
-
         ViewRenderable.builder()
             .setView(context, R.layout.character_layout)
             .build()
@@ -42,10 +42,11 @@ class CatFace(
                 uiRenderable.isShadowReceiver = false
                 characterNode?.renderable = uiRenderable
 
-                val imageView =
-                    (characterNode?.renderable as ViewRenderable)?.view?.findViewById<ImageView>(R.id.characterIV)
-                imageView?.let {
+                characterIV =
+                    (characterNode?.renderable as ViewRenderable)?.view?.findViewById<ImageView>(R.id.characterIV)!!
+                characterIV.let {
                     it.setBackgroundDrawable(anime.getAnime())
+
                 }
 
                 // Start the animation
@@ -61,8 +62,8 @@ class CatFace(
         super.onUpdate(frameTime)
         augmentedFace?.let { face ->
             val nose = face.getRegionPose(AugmentedFace.RegionType.NOSE_TIP)
-            Global.spawnPosZ = nose.tz()
-            characterNode?.worldPosition = Vector3(nose.tx(), nose.ty(), Global.spawnPosZ)
+            //Global.spawnPosZ = nose.tz()
+            characterNode?.worldPosition = Vector3(nose.tx(), -0.1f, Global.spawnPosZ)
         }
 
         // Update the ImageView to show the current frame of the animation

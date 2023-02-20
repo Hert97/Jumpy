@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer  name="idleAnimationDuration">200</integer >
-    <item name="gamePosZ" format="float" type="dimen">-0.3</item>
+    <item name="gamePosZ" format="float" type="dimen">-0.2</item>
 </resources>

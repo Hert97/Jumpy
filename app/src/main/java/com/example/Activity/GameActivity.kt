@@ -16,6 +16,7 @@ import com.example.CatFace
 import com.example.FishObject
 import com.example.jumpy.R
 import com.google.ar.core.*
+import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
 import kotlin.math.atan
@@ -25,6 +26,7 @@ import kotlin.random.Random
 object Global {
     var spawnPosZ = 0f
     var numFishesOnScreen = 0
+    var currCatFace : Node? = null
 }
 
 class GameActivity : AppCompatActivity() {
@@ -35,7 +37,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     lateinit var arFragment: FaceArFragment
-    var spawnPosY = 0.15f
+    var spawnPosY = 0.1f
     var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
     private var isSpawningFishes = true
@@ -62,6 +64,7 @@ class GameActivity : AppCompatActivity() {
                             val faceNode = CatFace(f, this)
                             faceNode.setParent(scene)
                             faceNodeMap.put(f, faceNode)
+                            Global.currCatFace = faceNode.characterNode
                         }
                     }
                     // Remove any AugmentedFaceNodes associated with an AugmentedFace that stopped tracking.
@@ -89,8 +92,8 @@ class GameActivity : AppCompatActivity() {
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
 
-       startSpawningFishes()
-       //spawnFishes(1)
+ //     startSpawningFishes()
+        spawnFishes(1)
     }
 
     private fun randomPosition(): Vector3 {
@@ -136,7 +139,7 @@ class GameActivity : AppCompatActivity() {
 
             if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
                 val position = randomPosition()
-                val imageView = FishObject(this, position,"Fish", arFragment.arSceneView.scene)
+                val imageView = FishObject(this, position)
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)
 
