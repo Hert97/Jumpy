@@ -2,6 +2,8 @@ package com.example.Activity
 
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.drawable.AnimationDrawable
+import android.graphics.drawable.BitmapDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -49,7 +51,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(view: View) {
         when (view.id) {
             R.id.button_play -> {
-                val intent = Intent(this, GameActivity::class.java)
+                val intent = Intent(this, FaceRegionsActivity::class.java)
 //                val intent = Intent(this, JumpyActivity::class.java)
                 startActivity(intent)
             }

@@ -31,7 +31,7 @@
         </activity>
         <!--            android:name="com.example.JumpyActivity"-->
         <activity
-            android:name="com.example.Activity.GameActivity"
+            android:name="com.example.Activity.FaceRegionsActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.NoActionBar"
