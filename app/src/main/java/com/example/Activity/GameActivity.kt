@@ -2,6 +2,8 @@ package com.example.Activity
 
 import android.app.ActivityManager
 import android.content.Context
+import android.opengl.Matrix
+import android.opengl.Matrix.invertM
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -19,12 +21,13 @@ import com.google.ar.core.*
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
+import java.nio.FloatBuffer
 import kotlin.math.atan
 import kotlin.math.tan
 import kotlin.random.Random
 
 object Global {
-    var spawnPosZ = 0f
+    var spawnPosZ = 0.1f
     var numFishesOnScreen = 0
     var currCatFace : Node? = null
 }
@@ -41,7 +44,6 @@ class GameActivity : AppCompatActivity() {
     var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
     private var isSpawningFishes = true
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!checkIsSupportedDeviceOrFinish()) {
@@ -79,36 +81,116 @@ class GameActivity : AppCompatActivity() {
                         }
                     }
                 }
+
         }
+
+        startSpawningFishes()
+        //spawnFishes(1)
 
         findViewById<ImageButton>(R.id.settings_button).setOnClickListener {
             //Restart Button
             //Back to main menu Button
         }
 
-
         /*============================== Game logic ==============================*/
         val outValue = TypedValue()
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
 
- //     startSpawningFishes()
-        spawnFishes(1)
+
     }
 
-    private fun randomPosition(): Vector3 {
+    private fun screenToWorldPosition(screenX : Float, screenY : Float) : FloatArray?
+    {
+        //Log.d("MainActivity", "Try screen pos")
+        // Get the ARCore session and frame
+        val frame = arFragment.arSceneView.arFrame ?: return null
 
-       
+
+        // Get the screen width and height
+        val screenWidth = arFragment.arSceneView.width.toFloat()
+        val screenHeight = arFragment.arSceneView.height.toFloat()
+        if(screenWidth <= 0.0f || screenHeight <= 0.0f )
+            return null
+        // Convert the vector from screen coordinates to normalized device coordinates (NDC)
+        val x = ( screenX / screenWidth) * 2.0f - 1.0f
+        val y = ( screenY / screenHeight) * 2.0f - 1.0f
+
+        // Create a 4D vector with the NDC coordinates and a depth value of 0
+        val ndcPoint = floatArrayOf( x ,y, 0.0f, 1.0f)
+
+        // Get the camera pose and projection matrix
+        val cameraPose = frame!!.camera.pose
+        val projectionMatrix = FloatArray(16)
+        frame.camera.getProjectionMatrix(projectionMatrix, 0, 0.1f, 100.0f)
+
+
+        // Get camera view matrix
+       /* val viewMat = FloatArray(16)
+        cameraPose.toMatrix(viewMat,0)
+        val vpMat = FloatArray(16)
+        Matrix.multiplyMM(vpMat, 0, projectionMatrix, 0, viewMat, 0)
+
+        // Inverse vpMat
+        val invVpMat = FloatArray(16)
+        Matrix.invertM(invVpMat,0,vpMat,0)
+        var worldPoint = FloatArray(4)
+        Matrix.multiplyMV(worldPoint, 0, invVpMat, 0, ndcPoint, 0)
+
+        val inv_w = 1.0f / worldPoint[3]
+        worldPoint[0] *= inv_w
+        worldPoint[1] *= inv_w
+        worldPoint[2] *= inv_w
+        return worldPoint*/
+
+        // Multiply the 4D vector by the inverse of the camera's projection matrix
+        val projectionMatrixInverse = FloatArray(16)
+        Matrix.invertM(projectionMatrixInverse, 0, projectionMatrix, 0)
+        val viewPoint = FloatArray(4)
+        Matrix.multiplyMV(viewPoint, 0, projectionMatrixInverse, 0, ndcPoint, 0)
+
+        // Multiply the resulting vector by the inverse of the camera's pose matrix
+        val viewMatrix = FloatArray(16)
+        val viewMatrixInverse = FloatArray(16)
+        cameraPose.inverse().toMatrix(viewMatrix, 0)
+        Matrix.invertM(viewMatrixInverse, 0, viewMatrix, 0)
+        val worldPoint = FloatArray(4)
+        Matrix.multiplyMV(worldPoint, 0, viewMatrixInverse, 0, viewPoint, 0)
+
+        // The resulting vector contains the world position of the screen pixel point
+        worldPoint[0]  = worldPoint[0] / worldPoint[3]
+        worldPoint[1]  = worldPoint[1]/ worldPoint[3]
+        worldPoint[2]  = worldPoint[2] / worldPoint[3]
+
+        return worldPoint
+    }
+
+    private fun randomPosition(): Vector3? {
+
         val minX = -0.05f
         val maxX = 0.05f
-        val x = (Math.random() * (maxX - minX) + minX).toFloat()
 
-        val y  = spawnPosY //arFragment.arSceneView.arFrame?.camera?.pose?.ty()?.minus(0.5f)?: 0.0f
-        Log.d("pos y", y.toString())
-        return Vector3(x, y, Global.spawnPosZ)
+        val screenWidth = arFragment.arSceneView.width.toDouble()
+
+        if(screenWidth > 0) {
+            val x = Random.nextDouble(0.0,screenWidth).toFloat()
+            val xy = screenToWorldPosition( 0.5f,0.0f) ?: return null
+
+            Log.d("MainActivity:", "X:${x}")
+            Log.d("MainActivity:", "xy:${xy[0]},${xy[1]}")
+            val camWorldPos = arFragment.arSceneView.scene.camera.localPosition
+            Log.d("MainActivity:", "xy:${xy[0]},${xy[1]}")
+            Log.d("MainActivity:", "Cam:${camWorldPos.x},${camWorldPos.y},${camWorldPos.z}")
+            return Vector3(xy[0], xy[1], Global.spawnPosZ)
+        }
+        return null
+        //val y  = spawnPosY //arFragment.arSceneView.arFrame?.camera?.pose?.ty()?.minus(0.5f)?: 0.0f
+        //Log.d("pos y", y.toString())
+        //return Vector3(x, y, Global.spawnPosZ)
     }
 
     private fun startSpawningFishes() {
+        Log.d("MainActivity","Start spawn")
         isSpawningFishes = true
         handler.postDelayed(object : Runnable {
             override fun run() {
@@ -128,7 +210,7 @@ class GameActivity : AppCompatActivity() {
         for (i in 0 until numObjects) {
 
             if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
-                val position = randomPosition()
+                val position = randomPosition() ?: continue
                 val imageView = FishObject(this, position)
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)
@@ -142,64 +224,6 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    private fun getScreenPosY() : Float?
-    {
-        val display = windowManager.defaultDisplay
-        val displayMetrics = DisplayMetrics()
-        display.getRealMetrics(displayMetrics)
-
-        val screenWidth = displayMetrics.widthPixels
-        val screenHeight = displayMetrics.heightPixels
-
-        val screenAspectRatio = screenHeight.toFloat() / screenWidth.toFloat()
-
-        val frame = arFragment.arSceneView.arFrame
-        val camera = frame?.camera
-        val intrinsics = camera?.imageIntrinsics
-
-        val focalLength = intrinsics?.focalLength!![1]
-        val verticalFov = 2.0 * atan(0.5 * intrinsics?.imageDimensions!![1].toDouble() / focalLength)
-
-        // Compute the distance from the camera to the screen center
-        val distance = screenHeight / (2 * tan(Math.toRadians(verticalFov) / 2))
-
-        // Compute the world position of the four corners of the screen
-        val pos : FloatArray = FloatArray(3)
-        val topLeft =
-            camera.displayOrientedPose?.compose(Pose.makeTranslation((-screenWidth/2).toFloat(), (-screenHeight/2).toFloat() / screenAspectRatio,
-                (-distance).toFloat()
-            ))?.extractTranslation()?.getTranslation(pos, 0)
-
-       val outPos = worldToCameraSpace(Vector3(pos[0], pos[1], pos[2]), camera)
-
-       return outPos.y
-
-    }
-
-    private fun worldToCameraSpace(worldPosition: Vector3, camera: Camera): Vector3 {
-        // Step 1'
-        val cameraPosition = arFragment.arSceneView.scene.camera.worldPosition
-
-        // Step 2
-        val cameraForward = Vector3.subtract(worldPosition, cameraPosition)
-            .normalized()
-
-        // Step 3
-        val cameraUp = Vector3.up()
-
-        // Step 4
-        val cameraRight = Vector3.cross(cameraForward, cameraUp)
-
-        // Step 5
-        val worldPositionToConvert = Vector3.subtract(worldPosition, cameraPosition)
-
-        // Step 6
-        val x = Vector3.dot(worldPositionToConvert, cameraRight)
-        val y = Vector3.dot(worldPositionToConvert, cameraUp)
-        val z = Vector3.dot(worldPositionToConvert, cameraForward)
-
-        return Vector3(x, y, z)
-    }
 
     private fun checkIsSupportedDeviceOrFinish(): Boolean {
         if (ArCoreApk.getInstance()

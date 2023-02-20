@@ -56,6 +56,7 @@ class  CatFace(
                 Log.e("CatFace", "Could not create ui element", throwable)
                 null
             }
+
     }
 
     override fun onUpdate(frameTime: FrameTime?) {
