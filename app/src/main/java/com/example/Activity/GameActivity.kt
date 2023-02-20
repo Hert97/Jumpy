@@ -98,17 +98,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun randomPosition(): Vector3 {
 
-        val frame = arFragment.arSceneView.arFrame
-        val cam = frame?.camera
-
-        cam?.let {
-            val dim =  it.imageIntrinsics.imageDimensions
-            val x = Random.nextInt(0,dim[0]).toFloat()
-            val y = 0.0f
-            val p = Pose.IDENTITY
-            p.
-
-        }
+       
         val minX = -0.05f
         val maxX = 0.05f
         val x = (Math.random() * (maxX - minX) + minX).toFloat()
