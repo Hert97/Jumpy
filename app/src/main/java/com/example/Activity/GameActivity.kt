@@ -19,6 +19,8 @@ import com.google.ar.core.*
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
 import kotlin.math.atan
+import kotlin.math.tan
+import kotlin.random.Random
 
 object Global {
     var spawnPosZ = 0f
@@ -92,6 +94,18 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun randomPosition(): Vector3 {
+
+        val frame = arFragment.arSceneView.arFrame
+        val cam = frame?.camera
+
+        cam?.let {
+            val dim =  it.imageIntrinsics.imageDimensions
+            val x = Random.nextInt(0,dim[0]).toFloat()
+            val y = 0.0f
+            val p = Pose.IDENTITY
+            p.
+
+        }
         val minX = -0.05f
         val maxX = 0.05f
         val x = (Math.random() * (maxX - minX) + minX).toFloat()
@@ -153,10 +167,10 @@ class GameActivity : AppCompatActivity() {
         val focalLength = intrinsics?.focalLength!![1]
         val verticalFov = 2.0 * atan(0.5 * intrinsics?.imageDimensions!![1].toDouble() / focalLength)
 
-// Compute the distance from the camera to the screen center
-        val distance = screenHeight / (2 * Math.tan(Math.toRadians(verticalFov) / 2))
+        // Compute the distance from the camera to the screen center
+        val distance = screenHeight / (2 * tan(Math.toRadians(verticalFov) / 2))
 
-// Compute the world position of the four corners of the screen
+        // Compute the world position of the four corners of the screen
         val pos : FloatArray = FloatArray(3)
         val topLeft =
             camera.displayOrientedPose?.compose(Pose.makeTranslation((-screenWidth/2).toFloat(), (-screenHeight/2).toFloat() / screenAspectRatio,
@@ -169,7 +183,7 @@ class GameActivity : AppCompatActivity() {
 
     }
 
-    fun worldToCameraSpace(worldPosition: Vector3, camera: Camera): Vector3 {
+    private fun worldToCameraSpace(worldPosition: Vector3, camera: Camera): Vector3 {
         // Step 1'
         val cameraPosition = arFragment.arSceneView.scene.camera.worldPosition
 
