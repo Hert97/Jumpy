@@ -1,10 +1,5 @@
 package com.example.Activity
 
-import AppDatabase
-import Score
-import ScoreRepo
-import ScoreViewModel
-import ScoreViewModelFactory
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Bundle
@@ -116,7 +111,7 @@ class GameActivity : AppCompatActivity() {
             for (i in it.indices){
                 Log.d(
                     "MainActivity",
-                    "Total score = ${it[i]}"
+                    "Total score = ${it[i].value}"
                 )
 
             }
