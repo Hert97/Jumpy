@@ -108,6 +108,12 @@ class FishObject(context: Context, position: Vector3, scene: Scene) : Node() {
                     "Fish touching cat"
                 )
                 destroy()
+                Global.score += 10
+                Log.d(
+                    "Score",
+                    Global.score.toString()
+                )
+
             }
         }
 
