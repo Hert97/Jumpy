@@ -3,7 +3,6 @@ package com.example
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.util.Log
-import android.util.TypedValue
 import android.widget.ImageView
 import com.example.Activity.Global
 import com.google.ar.core.AugmentedFace
@@ -13,7 +12,6 @@ import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.*
 import com.google.ar.sceneform.ux.AugmentedFaceNode
 import com.example.jumpy.R
-import kotlin.properties.Delegates
 
 class  CatFace(
     augmentedFace: AugmentedFace?,
@@ -43,10 +41,11 @@ class  CatFace(
                 characterNode?.renderable = uiRenderable
 
                 characterIV =
-                    (characterNode?.renderable as ViewRenderable)?.view?.findViewById<ImageView>(R.id.characterIV)!!
+                    (characterNode?.renderable as ViewRenderable)?.view?.findViewById(R.id.characterIV)!!
                 characterIV.let {
                     it.setBackgroundDrawable(anime.getAnime())
-
+                Global.catWidth = characterIV.layoutParams.width.toFloat()
+                Global.catHeight = characterIV.layoutParams.height.toFloat()
                 }
 
                 // Start the animation
@@ -63,7 +62,7 @@ class  CatFace(
         augmentedFace?.let { face ->
             val nose = face.getRegionPose(AugmentedFace.RegionType.NOSE_TIP)
             //Global.spawnPosZ = nose.tz()
-            characterNode?.worldPosition = Vector3(nose.tx(), -0.1f, Global.spawnPosZ)
+            characterNode?.worldPosition = Vector3(nose.tx(), -0.1f, Global.spawnPosZ) //TODO: needa apply gravity to the y value
         }
 
         // Update the ImageView to show the current frame of the animation

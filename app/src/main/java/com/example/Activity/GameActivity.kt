@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.FaceArFragment
 import com.example.CatFace
+import com.example.CatMath
 import com.example.FishObject
 import com.example.jumpy.R
 import com.google.ar.core.*
@@ -25,6 +26,8 @@ object Global {
     var spawnPosZ = 0f
     var numFishesOnScreen = 0
     var currCatFace : Node? = null
+    var catWidth = 1f
+    var catHeight = 1f
 }
 
 class GameActivity : AppCompatActivity() {
@@ -90,8 +93,8 @@ class GameActivity : AppCompatActivity() {
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
 
- //     startSpawningFishes()
-        spawnFishes(1)
+      startSpawningFishes()
+        //spawnFishes(1)
     }
 
     private fun randomPosition(): Vector3 {
@@ -99,8 +102,8 @@ class GameActivity : AppCompatActivity() {
         val maxX = 0.05f
         val x = (Math.random() * (maxX - minX) + minX).toFloat()
 
-        val y  = spawnPosY //arFragment.arSceneView.arFrame?.camera?.pose?.ty()?.minus(0.5f)?: 0.0f
-        Log.d("pos y", y.toString())
+        val y  = CatMath.screenToWorldCoordinates(arFragment.arSceneView.scene, Vector3(0f,0f,0f)).y //spawnPosY //arFragment.arSceneView.arFrame?.camera?.pose?.ty()?.minus(0.5f)?: 0.0f
+        Log.d("spawn pos y", y.toString())
         return Vector3(x, y, Global.spawnPosZ)
     }
 
@@ -125,7 +128,7 @@ class GameActivity : AppCompatActivity() {
 
             if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
                 val position = randomPosition()
-                val imageView = FishObject(this, position)
+                val imageView = FishObject(this, position, arFragment.arSceneView.scene)
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)
 
