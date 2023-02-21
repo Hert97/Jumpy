@@ -43,9 +43,7 @@ class Animator {
 
         anime = AnimationDrawable()
         sprites.forEach { bitmap ->
-            if (fDuration != null) {
-                anime.addFrame(BitmapDrawable(resources, bitmap), fDuration)
-            }
+            anime.addFrame(BitmapDrawable(resources, bitmap), fDuration)
         }
     }
 
