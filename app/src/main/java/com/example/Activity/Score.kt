@@ -3,8 +3,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "scores")
-data class Score(@PrimaryKey(autoGenerate = true)
-                     var id: Long = 0 ,
-                     var value: Int)
+data class Score(@PrimaryKey(autoGenerate = true) var id: Int,
+                 @ColumnInfo(name = "value") var value: Int)
 {
 }

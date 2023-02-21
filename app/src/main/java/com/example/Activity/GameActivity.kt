@@ -65,7 +65,7 @@ class GameActivity : AppCompatActivity() {
         sceneView.cameraStreamRenderPriority = Renderable.RENDER_PRIORITY_FIRST
         val scene = sceneView.scene
 
-        val database = AppDatabase.getDatabase(this)
+        val database = AppDatabase.getDatabase(this) //crashes here
         val repository = ScoreRepo(database.scoreDao())
 
         scene.addOnUpdateListener {
@@ -100,13 +100,13 @@ class GameActivity : AppCompatActivity() {
             //Restart Button
             //Back to main menu Button
         }
-      //  var test = Score(0,10)
-     //   var test1 = Score(0,20)
-     //   var test2 = Score(0,30)
+        var test = Score(0,10)
+        var test1 = Score(0,20)
+        var test2 = Score(0,30)
         vm = ViewModelProvider(this, ScoreViewModelFactory(repository))[ScoreViewModel::class.java]
-     //   vm.insertScore(test)
-    //    vm.insertScore(test1)
-    //    vm.insertScore(test2)
+        vm.insertScore(test)
+        vm.insertScore(test1)
+        vm.insertScore(test2)
         /*============================== Game logic ==============================*/
         val outValue = TypedValue()
         resources.getValue(R.dimen.gamePosZ, outValue, true)

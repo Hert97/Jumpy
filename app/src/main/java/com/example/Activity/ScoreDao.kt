@@ -1,12 +1,9 @@
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ScoreDao {
-    @Insert
+    @Insert (onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertScore(digit: Score)
 
     @Query("SELECT * FROM scores ORDER BY value DESC")
