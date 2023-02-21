@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.FaceArFragment
 import com.example.CatFace
+import com.example.CatMath
 import com.example.FishObject
 import com.example.jumpy.R
 import com.google.ar.core.*
@@ -101,8 +102,8 @@ class GameActivity : AppCompatActivity() {
         val maxX = 0.05f
         val x = (Math.random() * (maxX - minX) + minX).toFloat()
 
-        val y  = spawnPosY //arFragment.arSceneView.arFrame?.camera?.pose?.ty()?.minus(0.5f)?: 0.0f
-        Log.d("pos y", y.toString())
+        val y  = CatMath.screenToWorldCoordinates(arFragment.arSceneView.scene, Vector3(0f,0f,0f)).y //spawnPosY //arFragment.arSceneView.arFrame?.camera?.pose?.ty()?.minus(0.5f)?: 0.0f
+        Log.d("spawn pos y", y.toString())
         return Vector3(x, y, Global.spawnPosZ)
     }
 

@@ -13,7 +13,6 @@ import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ViewRenderable
 //import com.google.ar.sceneform.math.Matrix
-import android.opengl.Matrix
 
 
 class FishObject(context: Context, position: Vector3, scene: Scene) : Node() {
@@ -88,9 +87,9 @@ class FishObject(context: Context, position: Vector3, scene: Scene) : Node() {
         //Check collision
         if(Global.currCatFace != null)
         {
-            var objectAABB = AABB(worldToScreenCoordinates(scene!!,worldPosition), fishWidth.toFloat(), fishHeight.toFloat())
+            var objectAABB = AABB(CatMath.worldToScreenCoordinates(scene!!,worldPosition), fishWidth.toFloat(), fishHeight.toFloat())
             var catAABB = AABB(
-                worldToScreenCoordinates(scene!!, Global.currCatFace!!.worldPosition),
+                CatMath.worldToScreenCoordinates(scene!!, Global.currCatFace!!.worldPosition),
                 Global.catWidth,
                 Global.catHeight
             )
@@ -141,27 +140,5 @@ class FishObject(context: Context, position: Vector3, scene: Scene) : Node() {
             Log.d("success", "remove liao")
     }
 
-    fun worldToScreenCoordinates(scene: Scene, worldPos: Vector3): Vector3 {
-        val viewProjectionMatrix = FloatArray(16)
-        val cam = scene.camera
 
-        Matrix.multiplyMM(viewProjectionMatrix, 0, cam.viewMatrix.data, 0, cam.projectionMatrix.data, 0)
-        val worldPosHomogeneous = floatArrayOf(worldPos.x, worldPos.y, worldPos.z, 1.0f)
-
-        val clipPos = FloatArray(4)
-        Matrix.multiplyMV(clipPos, 0, viewProjectionMatrix, 0, worldPosHomogeneous, 0)
-        val ndcPos = Vector3(clipPos[0], clipPos[1], clipPos[2])
-        if(clipPos[3] != 0.0f)
-        {
-            ndcPos.scaled(1f/clipPos[3])
-        }
-        val screenWidth = scene.view.width.toFloat()
-        val screenHeight = scene.view.height.toFloat()
-        val screenPos = Vector3(
-            ((ndcPos.x + 1) / 2) * screenWidth,
-            ((1 - ndcPos.y) / 2) * screenHeight,
-            ndcPos.z
-        )
-        return screenPos
-    }
 }
