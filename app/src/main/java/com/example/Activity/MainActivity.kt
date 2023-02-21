@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(view: View) {
         when (view.id) {
             R.id.button_play -> {
-                val intent = Intent(this, FaceRegionsActivity::class.java)
+                val intent = Intent(this, GameActivity::class.java)
 //                val intent = Intent(this, JumpyActivity::class.java)
                 startActivity(intent)
             }
