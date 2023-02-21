@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         when (view.id) {
             R.id.button_play -> {
                 val intent = Intent(this, GameActivity::class.java)
-//                val intent = Intent(this, JumpyActivity::class.java)
                 startActivity(intent)
             }
             R.id.button_exit -> {

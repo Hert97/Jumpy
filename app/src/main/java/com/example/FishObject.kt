@@ -9,16 +9,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.Activity.Global
 import com.example.jumpy.R
 import com.google.ar.sceneform.Node
-import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ViewRenderable
+
 //import com.google.ar.sceneform.math.Matrix
 
 
-class FishObject(context: Context, position: Vector3, scene: Scene) : Node() {
+class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment) : Node() {
 
     companion object {
-        const val basePosY = -0.4f
         const val minGravity = -0.05f // Minimum gravity value
         const val maxGravity = -0.1f // Maximum gravity value
 
@@ -30,11 +29,13 @@ class FishObject(context: Context, position: Vector3, scene: Scene) : Node() {
     private var velocity = 0f
     private var fishImageView: ImageView
     private var mContext: Context
+    private var mArFragment: FaceArFragment
 
 
     init {
         localPosition = position
         mContext = context
+        mArFragment = arFragment
 
         fishImageView = ImageView(context)
         fishImageView.setImageResource(R.drawable.fish)
@@ -70,12 +71,13 @@ class FishObject(context: Context, position: Vector3, scene: Scene) : Node() {
                 Log.e("Fish Object", "Unable to load renderable", throwable)
                 null
             }
+
     }
 
-    var flag: Boolean = false
+    var dieLiao: Boolean = false
     override fun onUpdate(frameTime: com.google.ar.sceneform.FrameTime?) {
         super.onUpdate(frameTime)
-        if (flag)
+        if (dieLiao)
             return
 
         // update the position by applying gravity
@@ -85,9 +87,12 @@ class FishObject(context: Context, position: Vector3, scene: Scene) : Node() {
         localPosition = Vector3(pos.x, pos.y + velocity * dt, Global.spawnPosZ)
 
         //Check collision
-        if(Global.currCatFace != null)
-        {
-            var objectAABB = AABB(CatMath.worldToScreenCoordinates(scene!!,worldPosition), fishWidth.toFloat(), fishHeight.toFloat())
+        if (Global.currCatFace != null) {
+            var objectAABB = AABB(
+                CatMath.worldToScreenCoordinates(scene!!, worldPosition),
+                fishWidth.toFloat(),
+                fishHeight.toFloat()
+            )
             var catAABB = AABB(
                 CatMath.worldToScreenCoordinates(scene!!, Global.currCatFace!!.worldPosition),
                 Global.catWidth,
@@ -114,10 +119,16 @@ class FishObject(context: Context, position: Vector3, scene: Scene) : Node() {
                     Global.score.toString()
                 )
 
+                Global.catStartedJumping = true
+                if (!Global.catJumping) //cat not eating other fishes
+                {
+                    Global.catVelocity += Global.catJumpPower
+                    Global.catJumping = true
+                }
             }
         }
 
-        if (localPosition.y < basePosY) {
+        if (localPosition.y < Global.bottomPosY!!) {
             destroy()
         }
     }
@@ -141,7 +152,7 @@ class FishObject(context: Context, position: Vector3, scene: Scene) : Node() {
         onDeactivate()
         parent?.removeChild(this) //remove this node from the parent "arscene"
 
-        flag = true
+        dieLiao = true
         if (parent == null)
             Log.d("success", "remove liao")
     }
