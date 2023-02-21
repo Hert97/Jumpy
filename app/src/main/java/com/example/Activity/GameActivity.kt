@@ -23,11 +23,12 @@ import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
 import java.nio.FloatBuffer
 import kotlin.math.atan
+import kotlin.math.max
 import kotlin.math.tan
 import kotlin.random.Random
 
 object Global {
-    var spawnPosZ = 0.1f
+    var spawnPosZ = 0.0f
     var numFishesOnScreen = 0
     var currCatFace : Node? = null
 }
@@ -167,10 +168,8 @@ class GameActivity : AppCompatActivity() {
 
     private fun randomPosition(): Vector3? {
 
-        val minX = -0.05f
-        val maxX = 0.05f
 
-        val screenWidth = arFragment.arSceneView.width.toDouble()
+        /*val screenWidth = arFragment.arSceneView.width.toDouble()
 
         if(screenWidth > 0) {
             val x = Random.nextDouble(0.0,screenWidth).toFloat()
@@ -183,10 +182,14 @@ class GameActivity : AppCompatActivity() {
             Log.d("MainActivity:", "Cam:${camWorldPos.x},${camWorldPos.y},${camWorldPos.z}")
             return Vector3(xy[0], xy[1], Global.spawnPosZ)
         }
-        return null
-        //val y  = spawnPosY //arFragment.arSceneView.arFrame?.camera?.pose?.ty()?.minus(0.5f)?: 0.0f
+        return null*/
+
+        val minX = -0.05
+        val maxX = 0.05
+        val x = Random.nextDouble(minX, maxX).toFloat()
+        val y  = spawnPosY //arFragment.arSceneView.arFrame?.camera?.pose?.ty()?.minus(0.5f)?: 0.0f
         //Log.d("pos y", y.toString())
-        //return Vector3(x, y, Global.spawnPosZ)
+        return Vector3(x, y, Global.spawnPosZ)
     }
 
     private fun startSpawningFishes() {
