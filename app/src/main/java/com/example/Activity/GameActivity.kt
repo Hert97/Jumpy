@@ -5,10 +5,10 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.FaceArFragment
@@ -20,14 +20,22 @@ import com.google.ar.core.*
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
-import kotlin.math.atan
 
 object Global {
     var spawnPosZ = 0f
     var numFishesOnScreen = 0
-    var currCatFace : Node? = null
+    var currCatFace: Node? = null
     var catWidth = 1f
     var catHeight = 1f
+    var score = 0
+    var bottomPosY = 0f
+    var catVelocity = 0f
+    var catPosY = 0f
+
+    var catJumping = false
+    var catStartedJumping = false
+
+    const val catJumpPower = 0.5f
 }
 
 class GameActivity : AppCompatActivity() {
@@ -38,7 +46,6 @@ class GameActivity : AppCompatActivity() {
     }
 
     lateinit var arFragment: FaceArFragment
-    var spawnPosY = 0.1f
     var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
     private var isSpawningFishes = true
@@ -57,6 +64,8 @@ class GameActivity : AppCompatActivity() {
         val scene = sceneView.scene
 
         scene.addOnUpdateListener {
+            findViewById<TextView>(R.id.score).text = "Score: ${Global.score}"
+
             /* Ensuring that there is only 1 face being tracked at a time*/
             sceneView.session
                 ?.getAllTrackables(AugmentedFace::class.java)?.let {
@@ -68,17 +77,17 @@ class GameActivity : AppCompatActivity() {
                             Global.currCatFace = faceNode.characterNode
                         }
                     }
-                    // Remove any AugmentedFaceNodes associated with an AugmentedFace that stopped tracking.
-                    val iter = faceNodeMap.entries.iterator()
-                    while (iter.hasNext()) {
-                        val entry = iter.next()
-                        val face = entry.key
-                        if (face.trackingState == TrackingState.STOPPED) {
-                            val faceNode = entry.value
-                            faceNode.setParent(null)
-                            iter.remove()
-                        }
-                    }
+//                    // Remove any AugmentedFaceNodes associated with an AugmentedFace that stopped tracking.
+//                    val iter = faceNodeMap.entries.iterator()
+//                    while (iter.hasNext()) {
+//                        val entry = iter.next()
+//                        val face = entry.key
+//                        if (face.trackingState == TrackingState.STOPPED) {
+//                            val faceNode = entry.value
+//                            faceNode.setParent(null)
+//                            iter.remove()
+//                        }
+//                    }
                 }
         }
 
@@ -93,18 +102,39 @@ class GameActivity : AppCompatActivity() {
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
 
-      startSpawningFishes()
+        Global.bottomPosY = arFragment.arSceneView.arFrame?.camera?.imageIntrinsics?.let {
+            CatMath.screenToWorldCoordinates(
+                arFragment.arSceneView.scene,
+                Vector3(it.imageDimensions[0].toFloat(), 0.0f, 0.0f)
+            )
+        }?.y ?: 0.4f
+        Global.bottomPosY = Global.bottomPosY!! * -1f
+        Log.d("Base Pos Y", Global.bottomPosY.toString())
+
+        startSpawningFishes()
         //spawnFishes(1)
     }
 
-    private fun randomPosition(): Vector3 {
-        val minX = -0.05f
-        val maxX = 0.05f
-        val x = (Math.random() * (maxX - minX) + minX).toFloat()
+    private fun randomPosition(): Vector3? {
 
-        val y  = CatMath.screenToWorldCoordinates(arFragment.arSceneView.scene, Vector3(0f,0f,0f)).y //spawnPosY //arFragment.arSceneView.arFrame?.camera?.pose?.ty()?.minus(0.5f)?: 0.0f
-        Log.d("spawn pos y", y.toString())
-        return Vector3(x, y, Global.spawnPosZ)
+        val topRightPos = arFragment.arSceneView.arFrame?.camera?.imageIntrinsics?.let {
+            CatMath.screenToWorldCoordinates(
+                arFragment.arSceneView.scene,
+                Vector3(it.imageDimensions[1].toFloat(), 0.0f, 0.0f)
+            )
+        }
+
+        if (topRightPos != null) {
+            val minX = -topRightPos.x
+            val maxX = topRightPos.x
+            val x = (Math.random() * (maxX - minX) + minX).toFloat()
+
+            val y = topRightPos.y
+            Log.d("spawn pos x", x.toString())
+            Log.d("spawn pos y", y.toString())
+            return Vector3(x, y, Global.spawnPosZ)
+        }
+        return null
     }
 
     private fun startSpawningFishes() {
@@ -127,8 +157,8 @@ class GameActivity : AppCompatActivity() {
         for (i in 0 until numObjects) {
 
             if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
-                val position = randomPosition()
-                val imageView = FishObject(this, position, arFragment.arSceneView.scene)
+                val position = randomPosition() ?: return
+                val imageView = FishObject(this, position, arFragment)
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)
 
