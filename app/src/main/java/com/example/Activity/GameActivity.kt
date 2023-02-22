@@ -27,10 +27,18 @@ import com.google.ar.sceneform.rendering.Renderable
 object Global {
     var spawnPosZ = 0f
     var numFishesOnScreen = 0
-    var currCatFace : Node? = null
+    var currCatFace: Node? = null
     var catWidth = 1f
     var catHeight = 1f
     var score = 0
+    var bottomPosY = 0f
+    var catVelocity = 0f
+    var catPosY = 0f
+
+    var catJumping = false
+    var catStartedJumping = false
+
+    const val catJumpPower = 0.5f
 }
 
 class GameActivity : AppCompatActivity() {
@@ -75,17 +83,17 @@ class GameActivity : AppCompatActivity() {
                             Global.currCatFace = faceNode.characterNode
                         }
                     }
-                    // Remove any AugmentedFaceNodes associated with an AugmentedFace that stopped tracking.
-                    val iter = faceNodeMap.entries.iterator()
-                    while (iter.hasNext()) {
-                        val entry = iter.next()
-                        val face = entry.key
-                        if (face.trackingState == TrackingState.STOPPED) {
-                            val faceNode = entry.value
-                            faceNode.setParent(null)
-                            iter.remove()
-                        }
-                    }
+//                    // Remove any AugmentedFaceNodes associated with an AugmentedFace that stopped tracking.
+//                    val iter = faceNodeMap.entries.iterator()
+//                    while (iter.hasNext()) {
+//                        val entry = iter.next()
+//                        val face = entry.key
+//                        if (face.trackingState == TrackingState.STOPPED) {
+//                            val faceNode = entry.value
+//                            faceNode.setParent(null)
+//                            iter.remove()
+//                        }
+//                    }
                 }
         }
 
@@ -148,16 +156,18 @@ class GameActivity : AppCompatActivity() {
     private fun randomPosition(): Vector3? {
 
         val topRightPos = arFragment.arSceneView.arFrame?.camera?.imageIntrinsics?.let {
-            CatMath.screenToWorldCoordinates(arFragment.arSceneView.scene,Vector3( it.imageDimensions[1].toFloat(),0.0f,0.0f))
+            CatMath.screenToWorldCoordinates(
+                arFragment.arSceneView.scene,
+                Vector3(it.imageDimensions[1].toFloat(), 0.0f, 0.0f)
+            )
         }
 
-        if(topRightPos != null)
-        {
+        if (topRightPos != null) {
             val minX = -topRightPos.x
             val maxX = topRightPos.x
             val x = (Math.random() * (maxX - minX) + minX).toFloat()
 
-            val y  = topRightPos.y
+            val y = topRightPos.y
             Log.d("spawn pos x", x.toString())
             Log.d("spawn pos y", y.toString())
             return Vector3(x, y, Global.spawnPosZ)
@@ -187,8 +197,8 @@ class GameActivity : AppCompatActivity() {
         for (i in 0 until numObjects) {
 
             if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
-                val position = randomPosition()?: return
-                val imageView = FishObject(this, position, arFragment.arSceneView.scene)
+                val position = randomPosition() ?: return
+                val imageView = FishObject(this, position, arFragment)
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)
 

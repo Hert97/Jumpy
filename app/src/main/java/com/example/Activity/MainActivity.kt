@@ -3,6 +3,9 @@ package com.example.Activity
 //import com.example.JumpyActivity
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.drawable.AnimationDrawable
+import android.graphics.drawable.BitmapDrawable
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -21,11 +24,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         val buttonPlay : Button = findViewById(R.id.button_play)
         val buttonExit : Button = findViewById(R.id.button_exit)
-        val buttonCredit : Button = findViewById(R.id.button_credit)
+        val buttonLeaderboard : Button = findViewById(R.id.button_leaderboard)
 
         buttonPlay.setOnClickListener(this)
         buttonExit.setOnClickListener(this)
-        buttonCredit.setOnClickListener(this)
+        buttonLeaderboard.setOnClickListener(this)
 
         val catImageView : ImageView = findViewById(R.id.mm_image_1)
 
@@ -55,8 +58,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             R.id.button_exit -> {
                 finish()
             }
-            R.id.button_credit -> {
-                val intent = Intent(this, CreditActivity::class.java)
+            R.id.button_leaderboard -> {
+                val intent = Intent(this, LeaderboardActivity::class.java)
                 startActivity(intent)
             }
         }

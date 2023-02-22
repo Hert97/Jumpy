@@ -19,6 +19,7 @@ class  CatFace(
 ) : AugmentedFaceNode(augmentedFace) {
 
     var characterNode: Node? = null
+    private val gravity = -1f // gravity acceleration in m/s^2
 
     private lateinit var anime: Animator
     private lateinit var characterIV : ImageView
@@ -55,15 +56,32 @@ class  CatFace(
                 Log.e("CatFace", "Could not create ui element", throwable)
                 null
             }
-
+        Global.catPosY = -0.18f// Global.bottomPosY
+        characterNode?.worldPosition = Vector3(0f, Global.catPosY, Global.spawnPosZ)
     }
 
     override fun onUpdate(frameTime: FrameTime?) {
         super.onUpdate(frameTime)
+
+        val dt = frameTime?.deltaSeconds ?: 0f
+        if(Global.catJumping)
+        { //is jumping
+            Global.catJumping = false
+        }
+        else
+        { //Not jumping
+            if(Global.catStartedJumping) Global.catVelocity += gravity * dt
+        }
+
+        Log.d("jumpingVelocity", Global.catVelocity.toString())
+        Log.d("isJumping", Global.catJumping.toString())
+
         augmentedFace?.let { face ->
+            Log.d("CatPosY",  Global.catPosY.toString())
             val nose = face.getRegionPose(AugmentedFace.RegionType.NOSE_TIP)
-            //Global.spawnPosZ = nose.tz()
-            characterNode?.worldPosition = Vector3(nose.tx(), -0.1f, Global.spawnPosZ) //TODO: needa apply gravity to the y value
+            Global.catPosY += Global.catVelocity * dt
+            characterNode?.worldPosition = Vector3(nose.tx(), Global.catPosY, Global.spawnPosZ)
+            // characterNode?.worldPosition = Vector3(0f, characterNode?.worldPosition?.y!!, Global.spawnPosZ)
         }
 
         // Update the ImageView to show the current frame of the animation
