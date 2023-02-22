@@ -25,6 +25,8 @@ import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
 
 object Global {
+    const val MAX_FISHES_ON_SCREEN = 20
+
     var spawnPosZ = 0f
     var numFishesOnScreen = 0
     var currCatFace: Node? = null
@@ -42,14 +44,15 @@ object Global {
     var catJumping = false
     var catStartedJumping = false
 
-    const val catJumpPower = 0.5f
+    const val catJumpPower = 0.35f
+
+    var fishPool = Array(MAX_FISHES_ON_SCREEN) { FishObject() }
 }
 
 class GameActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
         const val SPAWN_DELAY_MS = 2000L //2 seconds
-        const val MAX_FISHES_ON_SCREEN = 20
     }
 
     private lateinit var vm: ScoreViewModel
@@ -124,6 +127,12 @@ class GameActivity : AppCompatActivity() {
         val outValue = TypedValue()
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
+
+        FishObject.initializeFishProp(this)
+        for(i in 0 until Global.MAX_FISHES_ON_SCREEN)
+        {
+            Global.fishPool[i].initialize()
+        }
 
         vm.getAllScore().observe(this) {
             for (i in it.indices) {
@@ -213,12 +222,16 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun spawnFishes(numObjects: Int) {
-        for (i in 0 until numObjects) {
-
-            if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
+        var toSpawn = numObjects
+        for(i in 0 until Global.MAX_FISHES_ON_SCREEN)
+        {
+            if(Global.numFishesOnScreen < Global.MAX_FISHES_ON_SCREEN &&
+                toSpawn > 0 && !Global.fishPool[i].isActive)
+            {
                 val position = randomPosition() ?: return
-                val imageView = FishObject(this, position, arFragment)
-                imageView.Setup()
+                Global.fishPool[i].create(position)
+
+                val imageView = Global.fishPool[i]
                 imageView.setParent(arFragment.arSceneView.scene)
 
                 //Global.score++
@@ -230,6 +243,7 @@ class GameActivity : AppCompatActivity() {
                     "MainActivity",
                     "Fish added to screen. numFishesOnScreen = ${Global.numFishesOnScreen}"
                 )
+                toSpawn--
             }
         }
     }
