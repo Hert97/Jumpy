@@ -82,7 +82,7 @@ class GameActivity : AppCompatActivity() {
                 ?.getAllTrackables(AugmentedFace::class.java)?.let {
                     for (f in it) {
                         if (!faceNodeMap.containsKey(f)) {
-                            val faceNode = CatFace(f, this, arFragment)
+                            val faceNode = CatFace(f, this)
                             faceNode.setParent(scene)
                             faceNodeMap.put(f, faceNode)
                             Global.currCatFace = faceNode.characterNode
@@ -165,8 +165,8 @@ class GameActivity : AppCompatActivity() {
 
                 Global.hasInit = true
 
-                startSpawningFishes()
-                //spawnFishes(1)
+                //startSpawningFishes()
+                spawnFishes(1)
             }
         }
     }
@@ -205,7 +205,7 @@ class GameActivity : AppCompatActivity() {
         for (i in 0 until numObjects) {
 
             if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
-                val position = randomPosition() ?: return
+                val position = Vector3()//randomPosition() ?: return
                 val imageView = FishObject(this, position, arFragment)
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)

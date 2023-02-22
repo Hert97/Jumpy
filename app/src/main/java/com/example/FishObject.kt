@@ -11,6 +11,7 @@ import com.example.jumpy.R
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ViewRenderable
+import java.util.Vector
 
 //import com.google.ar.sceneform.math.Matrix
 
@@ -33,7 +34,8 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
 
 
     init {
-        localPosition = position
+        worldPosition = position
+        localPosition = Vector3(localPosition.x, localPosition.y, Global.spawnPosZ)
         mContext = context
         mArFragment = arFragment
 
@@ -46,8 +48,8 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
             (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
 
             // Set layout parameters of ImageView
-            val widthInPercentage = 10 // in %, e.g.5%
-            val heightInPercentage =10// in %, e.g.5%
+            val widthInPercentage = 100 // in %, e.g.5%
+            val heightInPercentage =100// in %, e.g.5%
             fishWidth = displayMetrics.widthPixels * widthInPercentage / 100
             fishHeight = displayMetrics.heightPixels * heightInPercentage / 100
         }
@@ -56,7 +58,7 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
             fishWidth,
             fishHeight
         )
-        gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
+        gravity = 0f//(Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
     }
 
     fun Setup() {// Need to call this after creating the fish object
@@ -75,14 +77,15 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
     var dieLiao: Boolean = false
     override fun onUpdate(frameTime: com.google.ar.sceneform.FrameTime?) {
         super.onUpdate(frameTime)
+        return
         if (dieLiao)
             return
 
         // update the position by applying gravity
         val dt = frameTime?.deltaSeconds ?: 0f
         velocity += gravity * dt
-        val pos = localPosition
-        localPosition = Vector3(pos.x, pos.y + velocity * dt, Global.spawnPosZ)
+        val pos = worldPosition
+        worldPosition = Vector3(pos.x, pos.y + velocity * dt, worldPosition.z)
 
         //Check collision
         if (Global.currCatFace != null) {
@@ -129,7 +132,7 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
 
 
         if (Global.bottomRightPos != null) {
-            if (localPosition.y < Global.bottomRightPos!!.y) {
+            if (worldPosition.y < Global.bottomRightPos!!.y) {
                 destroy()
             }
         }
