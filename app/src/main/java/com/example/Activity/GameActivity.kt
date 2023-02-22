@@ -10,7 +10,12 @@ import android.util.TypedValue
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.room.Room
 import com.example.FaceArFragment
 import com.example.CatFace
 import com.example.CatMath
@@ -44,7 +49,7 @@ class GameActivity : AppCompatActivity() {
         const val SPAWN_DELAY_MS = 2000L //2 seconds
         const val MAX_FISHES_ON_SCREEN = 20
     }
-
+    private lateinit var vm: ScoreViewModel
     lateinit var arFragment: FaceArFragment
     var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
@@ -62,6 +67,9 @@ class GameActivity : AppCompatActivity() {
         val sceneView = arFragment.arSceneView
         sceneView.cameraStreamRenderPriority = Renderable.RENDER_PRIORITY_FIRST
         val scene = sceneView.scene
+
+        val database = AppDatabase.getDatabase(this) //crashes here
+        val repository = ScoreRepo(database.scoreDao())
 
         scene.addOnUpdateListener {
             findViewById<TextView>(R.id.score).text = "Score: ${Global.score}"
@@ -95,13 +103,30 @@ class GameActivity : AppCompatActivity() {
             //Restart Button
             //Back to main menu Button
         }
-
-
+        var test = Score(0,10)
+        var test1 = Score(0,20)
+        var test2 = Score(0,30)
+        vm = ViewModelProvider(this, ScoreViewModelFactory(repository))[ScoreViewModel::class.java]
+        vm.insertScore(test)
+        vm.insertScore(test1)
+        vm.insertScore(test2)
         /*============================== Game logic ==============================*/
         val outValue = TypedValue()
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
 
+        vm.getAllScore().observe(this) {
+            for (i in it.indices){
+                Log.d(
+                    "MainActivity",
+                    "Total score = ${it[i].value}"
+                )
+
+            }
+
+        }
+
+      startSpawningFishes()
         Global.bottomPosY = arFragment.arSceneView.arFrame?.camera?.imageIntrinsics?.let {
             CatMath.screenToWorldCoordinates(
                 arFragment.arSceneView.scene,
@@ -162,6 +187,10 @@ class GameActivity : AppCompatActivity() {
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)
 
+                Global.score++
+                //val newScore = Score(value = Global.score)
+                //db.scoreDao().insertScore(newScore)
+
                 Global.numFishesOnScreen++
                 Log.d(
                     "MainActivity",
@@ -192,5 +221,14 @@ class GameActivity : AppCompatActivity() {
             }
         }
         return true
+    }
+
+    private fun showHighScores() {
+       // val scores = db.scoreDao().getAllScores().take(10)
+        //val scoreText = StringBuilder("High Scores:\n")
+       // for ((index, score) in scores.withIndex()) {
+        //    scoreText.append("${index + 1}. ${score.value}\n")
+       // }
+        //findViewById<TextView>(R.id.score).text = scoreText.toString()
     }
 }
