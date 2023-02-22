@@ -3,9 +3,6 @@ package com.example.Activity
 //import com.example.JumpyActivity
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.graphics.drawable.AnimationDrawable
-import android.graphics.drawable.BitmapDrawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
