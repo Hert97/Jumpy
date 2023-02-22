@@ -100,7 +100,9 @@ class GameActivity : AppCompatActivity() {
                         }
                     }
                 }
-            onUpdate()
+            if (!Global.hasInit) {
+                onUpdate()
+            }
         }
 
 
@@ -137,51 +139,56 @@ class GameActivity : AppCompatActivity() {
     }
 
     fun onUpdate() {
-       // if (!Global.hasInit) {
-            val scene = arFragment.arSceneView.scene
-            val arframe = arFragment.arSceneView.arFrame
-            if (arframe != null && arframe?.camera != null
-                && scene.view.width != 0 && scene.view.height != 0
-            ) {
-                // Camera is active
-                Global.topLefttPos = CatMath.screenToWorldCoordinates(scene, Vector3(0f, 0f, 0f))
-                Global.bottomRightPos =
-                    arFragment.arSceneView.arFrame?.camera?.imageIntrinsics?.let {
-                        CatMath.screenToWorldCoordinates(
-                            arFragment.arSceneView.scene,
-                            Vector3(
-                                it.imageDimensions[1].toFloat(),
-                                it.imageDimensions[0].toFloat(),
-                                0f
-                            )
+        val scene = arFragment.arSceneView.scene
+        val arframe = arFragment.arSceneView.arFrame
+        if (arframe != null && arframe?.camera != null
+            && scene.view.width != 0 && scene.view.height != 0
+        ) {
+            // Camera is active
+            Global.topLefttPos = CatMath.screenToWorldCoordinates(scene, Vector3(0f, 0f, 0f))
+            Global.bottomRightPos =
+                arFragment.arSceneView.arFrame?.camera?.imageIntrinsics?.let {
+                    CatMath.screenToWorldCoordinates(
+                        arFragment.arSceneView.scene,
+                        Vector3(
+                            it.imageDimensions[1].toFloat(),
+                            it.imageDimensions[0].toFloat(),
+                            0f
                         )
-                    }
+                    )
+                }
+            Global.bottomRightPos!!.x *= -1f
+            Global.bottomRightPos!!.y *= -1f
 
-                Log.d("Top Left Pos", "(${Global.topLefttPos!!.x}, ${Global.topLefttPos!!.y})")
-                Log.d(
-                    "Bottom Right Pos",
-                    "(${Global.bottomRightPos!!.x}, ${Global.bottomRightPos!!.y})"
-                )
+            Log.d("Top Left Pos", "(${Global.topLefttPos!!.x}, ${Global.topLefttPos!!.y})")
+            Log.d(
+                "Bottom Right Pos",
+                "(${Global.bottomRightPos!!.x}, ${Global.bottomRightPos!!.y})"
+            )
 
-               // Global.hasInit = true
+            /*NOT WORKING SADGEEEEEE*/
+//            var temp = CatMath.calculateObjectPosition(Global.spawnPosZ, Global.topLefttPos!!.x, Global.topLefttPos!!.y, arFragment.arSceneView.arFrame?.camera?.imageIntrinsics?.getFocalLength()
+//                ?.get(0) ?: 0f)
+//            Global.topLefttPos = Vector3(temp.first,temp.second, 0f)
+//            temp = CatMath.calculateObjectPosition(Global.spawnPosZ, Global.bottomRightPos!!.x, Global.bottomRightPos!!.y, arFragment.arSceneView.arFrame?.camera?.imageIntrinsics?.getFocalLength()
+//                ?.get(0) ?: 0f)
+//            Global.bottomRightPos = Vector3(temp.first,temp.second, 0f)
 
-                startSpawningFishes()
-                //spawnFishes(1)
-//            }
+
+            Global.hasInit = true
+
+            startSpawningFishes()
+            //spawnFishes(3)
         }
-
-//        val scene = arFragment.arSceneView.scene
-//        var topleft = CatMath.screenToWorldCoordinates(scene, Vector3(0f, 0f, 0f))
-//        Log.d("huh Top Left Pos", "(${topleft.x}, ${topleft.y})")
     }
 
     private fun randomPosition(): Vector3? {
         if (Global.topLefttPos != null && Global.bottomRightPos != null) {
-            val minX = -Global.bottomRightPos!!.x
-            val maxX = Global.bottomRightPos!!.x
+            val minX = Global.bottomRightPos!!.x
+            val maxX = -Global.bottomRightPos!!.x
             val x = (Math.random() * (maxX - minX) + minX).toFloat()
 
-            val y = Global.topLefttPos!!.y
+            val y = 0.25f //Temp hax, suppose to use -> Global.topLefttPos!!.y
             Log.d("spawn pos x", x.toString())
             Log.d("spawn pos y", y.toString())
             return Vector3(x, y, Global.spawnPosZ)
@@ -209,7 +216,7 @@ class GameActivity : AppCompatActivity() {
         for (i in 0 until numObjects) {
 
             if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
-                val position = Vector3(0f,0f,0f)//randomPosition() ?: return
+                val position = randomPosition() ?: return
                 val imageView = FishObject(this, position, arFragment)
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)

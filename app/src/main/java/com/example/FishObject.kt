@@ -19,8 +19,8 @@ import java.util.Vector
 class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment) : Node() {
 
     companion object {
-        const val minGravity = -0.05f // Minimum gravity value
-        const val maxGravity = -0.1f // Maximum gravity value
+        const val minGravity = -.05f // Minimum gravity value
+        const val maxGravity = -.1f // Maximum gravity value
 
         private var fishWidth: Int = 0
         private var fishHeight: Int = 0
@@ -35,31 +35,31 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
 
     init {
         //worldPosition = position
-        //localPosition = Vector3(localPosition.x, localPosition.y, Global.spawnPosZ)
-        localPosition = Vector3(0f, 0f, -1f)
+        localPosition = Vector3(position.x, position.y, Global.spawnPosZ)
         mContext = context
         mArFragment = arFragment
 
         fishImageView = ImageView(context)
         fishImageView.setImageResource(R.drawable.fish_25p)
 
-        if (fishWidth == 0 || fishHeight == 0) {
-            // Get screen size
-            val displayMetrics = DisplayMetrics()
-            (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
-
-            // Set layout parameters of ImageView
-            val widthInPercentage = 10 // in %, e.g.5%
-            val heightInPercentage = 10// in %, e.g.5%
-            fishWidth = displayMetrics.widthPixels * widthInPercentage / 100
-            fishHeight = displayMetrics.heightPixels * heightInPercentage / 100
-        }
-
+//        if (fishWidth == 0 || fishHeight == 0) {
+//            // Get screen size
+//            val displayMetrics = DisplayMetrics()
+//            (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
+//
+//            // Set layout parameters of ImageView
+//            val widthInPercentage = 2 // in %, e.g.5%
+//            val heightInPercentage = 2// in %, e.g.5%
+//            fishWidth = displayMetrics.widthPixels * widthInPercentage / 100
+//            fishHeight = displayMetrics.heightPixels * heightInPercentage / 100
+//        }
+        fishWidth = 25
+        fishHeight = 25
         fishImageView.layoutParams = ConstraintLayout.LayoutParams(
             fishWidth,
             fishHeight
         )
-        gravity = 0f//(Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
+        gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
     }
 
     fun Setup() {// Need to call this after creating the fish object
@@ -78,36 +78,35 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
     var dieLiao: Boolean = false
     override fun onUpdate(frameTime: com.google.ar.sceneform.FrameTime?) {
         super.onUpdate(frameTime)
-        return
         if (dieLiao)
             return
 
         // update the position by applying gravity
         val dt = frameTime?.deltaSeconds ?: 0f
         velocity += gravity * dt
-        val pos = worldPosition
-        worldPosition = Vector3(pos.x, pos.y + velocity * dt, worldPosition.z)
+        val pos = localPosition
+        localPosition = Vector3(pos.x, pos.y + velocity * dt, pos.z)
 
         //Check collision
         if (Global.currCatFace != null) {
             var objectAABB = AABB(
-                CatMath.worldToScreenCoordinates(scene!!, worldPosition),
+                CatMath.worldToScreenCoordinates(scene!!, localPosition),
                 fishWidth.toFloat(),
                 fishHeight.toFloat()
             )
             var catAABB = AABB(
-                CatMath.worldToScreenCoordinates(scene!!, Global.currCatFace!!.worldPosition),
+                CatMath.worldToScreenCoordinates(scene!!, Global.currCatFace!!.localPosition),
                 Global.catWidth,
                 Global.catHeight
             )
-//            Log.d("FishObject", "objectAABB = ${objectAABB.min.x}, ${objectAABB.min.y}, ${objectAABB.max.x}, ${objectAABB.max.y} ")
-//            Log.d("FishObject", "catAABB = ${catAABB.min.x}, ${catAABB.min.y}, ${catAABB.max.x}, ${catAABB.max.y}")
-//
-//            Log.d("FishObject", "objectWorldPos = ${worldPosition.x},${worldPosition.y},${worldPosition.z}")
-//            Log.d("FishObject", "catWorldPos = ${Global.currCatFace!!.worldPosition.x},${Global.currCatFace!!.worldPosition.y},${Global.currCatFace!!.worldPosition.z}")
-//
-//            Log.d("FishObject", "objectLocalPos = ${localPosition.x},${localPosition.y},${localPosition.z}")
-//            Log.d("FishObject", "catLocalPos = ${Global.currCatFace!!.localPosition.x},${Global.currCatFace!!.localPosition.y},${Global.currCatFace!!.localPosition.z}")
+            Log.d("FishObject", "objectAABB = ${objectAABB.min.x}, ${objectAABB.min.y}, ${objectAABB.max.x}, ${objectAABB.max.y} ")
+            Log.d("FishObject", "catAABB = ${catAABB.min.x}, ${catAABB.min.y}, ${catAABB.max.x}, ${catAABB.max.y}")
+
+            Log.d("FishObject", "objectWorldPos = ${worldPosition.x},${worldPosition.y},${worldPosition.z}")
+            Log.d("FishObject", "catWorldPos = ${Global.currCatFace!!.worldPosition.x},${Global.currCatFace!!.worldPosition.y},${Global.currCatFace!!.worldPosition.z}")
+
+            Log.d("FishObject", "objectLocalPos = ${localPosition.x},${localPosition.y},${localPosition.z}")
+            Log.d("FishObject", "catLocalPos = ${Global.currCatFace!!.localPosition.x},${Global.currCatFace!!.localPosition.y},${Global.currCatFace!!.localPosition.z}")
 
             if (objectAABB.intersects(catAABB)) {
                 Log.d(
@@ -131,18 +130,21 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
             }
         }
 
-
-        if (Global.bottomRightPos != null) {
-            if (worldPosition.y < Global.bottomRightPos!!.y) {
-                destroy()
-            }
-        }
-        else
+        if (localPosition.y < -0.2f)
         {
-            if (localPosition.y < -1f) {
                 destroy()
-            }
         }
+//        if (Global.bottomRightPos != null) {
+//            if (worldPosition.y < Global.bottomRightPos!!.y) {
+//                //destroy()
+//            }
+//        }
+//        else
+//        {
+//            if (localPosition.y < -1f) {
+//                //destroy()
+//            }
+//        }
     }
 
 
@@ -157,7 +159,6 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
     }
 
     fun destroy() {
-        return
         // check if the fish is below the ground plane and remove it
         Global.numFishesOnScreen--
         Log.d(
