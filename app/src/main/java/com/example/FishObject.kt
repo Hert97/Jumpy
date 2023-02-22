@@ -34,8 +34,9 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
 
 
     init {
-        worldPosition = position
-        localPosition = Vector3(localPosition.x, localPosition.y, Global.spawnPosZ)
+        //worldPosition = position
+        //localPosition = Vector3(localPosition.x, localPosition.y, Global.spawnPosZ)
+        localPosition = Vector3(0f, 0f, -1f)
         mContext = context
         mArFragment = arFragment
 
@@ -48,8 +49,8 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
             (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
 
             // Set layout parameters of ImageView
-            val widthInPercentage = 100 // in %, e.g.5%
-            val heightInPercentage =100// in %, e.g.5%
+            val widthInPercentage = 10 // in %, e.g.5%
+            val heightInPercentage = 10// in %, e.g.5%
             fishWidth = displayMetrics.widthPixels * widthInPercentage / 100
             fishHeight = displayMetrics.heightPixels * heightInPercentage / 100
         }
@@ -147,6 +148,7 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
 
 
     override fun onDeactivate() {
+        return
         // Perform cleanup operations
         fishImageView.setImageDrawable(null)
         fishImageView.setImageBitmap(null)
@@ -155,6 +157,7 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
     }
 
     fun destroy() {
+        return
         // check if the fish is below the ground plane and remove it
         Global.numFishesOnScreen--
         Log.d(

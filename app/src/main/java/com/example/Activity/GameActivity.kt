@@ -137,7 +137,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     fun onUpdate() {
-        if (!Global.hasInit) {
+       // if (!Global.hasInit) {
             val scene = arFragment.arSceneView.scene
             val arframe = arFragment.arSceneView.arFrame
             if (arframe != null && arframe?.camera != null
@@ -163,12 +163,16 @@ class GameActivity : AppCompatActivity() {
                     "(${Global.bottomRightPos!!.x}, ${Global.bottomRightPos!!.y})"
                 )
 
-                Global.hasInit = true
+               // Global.hasInit = true
 
-                //startSpawningFishes()
-                spawnFishes(1)
-            }
+                startSpawningFishes()
+                //spawnFishes(1)
+//            }
         }
+
+//        val scene = arFragment.arSceneView.scene
+//        var topleft = CatMath.screenToWorldCoordinates(scene, Vector3(0f, 0f, 0f))
+//        Log.d("huh Top Left Pos", "(${topleft.x}, ${topleft.y})")
     }
 
     private fun randomPosition(): Vector3? {
@@ -205,12 +209,12 @@ class GameActivity : AppCompatActivity() {
         for (i in 0 until numObjects) {
 
             if (Global.numFishesOnScreen < MAX_FISHES_ON_SCREEN) {
-                val position = Vector3()//randomPosition() ?: return
+                val position = Vector3(0f,0f,0f)//randomPosition() ?: return
                 val imageView = FishObject(this, position, arFragment)
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)
 
-                Global.score++
+                //Global.score++
                 //val newScore = Score(value = Global.score)
                 //db.scoreDao().insertScore(newScore)
 
