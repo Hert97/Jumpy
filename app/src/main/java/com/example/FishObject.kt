@@ -46,8 +46,8 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
             (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
 
             // Set layout parameters of ImageView
-            val widthInPercentage = 2 // in %, e.g.5%
-            val heightInPercentage = 2// in %, e.g.5%
+            val widthInPercentage = 10 // in %, e.g.5%
+            val heightInPercentage =10// in %, e.g.5%
             fishWidth = displayMetrics.widthPixels * widthInPercentage / 100
             fishHeight = displayMetrics.heightPixels * heightInPercentage / 100
         }
@@ -123,13 +123,25 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
                     Global.catVelocity += Global.catJumpPower
                     Global.catJumping = true
                 }
+
             }
         }
 
-        if (localPosition.y < Global.bottomPosY!!) {
-            destroy()
+
+        if (Global.bottomRightPos != null) {
+            if (localPosition.y < Global.bottomRightPos!!.y) {
+                destroy()
+            }
+        }
+        else
+        {
+            if (localPosition.y < -1f) {
+                destroy()
+            }
         }
     }
+
+
 
     override fun onDeactivate() {
         // Perform cleanup operations

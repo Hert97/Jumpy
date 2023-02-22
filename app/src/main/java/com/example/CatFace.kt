@@ -16,6 +16,7 @@ import com.example.jumpy.R
 class  CatFace(
     augmentedFace: AugmentedFace?,
     val context: Context,
+    arFragment: FaceArFragment,
 ) : AugmentedFaceNode(augmentedFace) {
 
     var characterNode: Node? = null
@@ -23,6 +24,7 @@ class  CatFace(
 
     private lateinit var anime: Animator
     private lateinit var characterIV : ImageView
+    private val mArFragment = arFragment
     override fun onActivate() {
         super.onActivate()
 
@@ -82,6 +84,17 @@ class  CatFace(
             Global.catPosY += Global.catVelocity * dt
             characterNode?.worldPosition = Vector3(nose.tx(), Global.catPosY, Global.spawnPosZ)
             // characterNode?.worldPosition = Vector3(0f, characterNode?.worldPosition?.y!!, Global.spawnPosZ)
+        }
+
+        if(Global.topLefttPos != null)
+        {
+            if(characterNode?.worldPosition?.y!! > Global.topLefttPos!!.y - Global.catWidth)
+            {
+                val camera = mArFragment.arSceneView.scene?.camera
+                val currentPos = camera?.worldPosition ?: Vector3.zero()
+                val shiftAmount = 0.2f // adjust as needed
+                //camera?.worldPosition = Vector3(currentPos.x, currentPos.y + shiftAmount, currentPos.z)
+            }
         }
 
         // Update the ImageView to show the current frame of the animation
