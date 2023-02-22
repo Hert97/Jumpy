@@ -10,24 +10,19 @@ import android.util.TypedValue
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.viewModelFactory
-import androidx.room.Room
-import com.example.FaceArFragment
 import com.example.CatFace
 import com.example.CatMath
+import com.example.FaceArFragment
 import com.example.FishObject
 import com.example.jumpy.R
-import com.google.ar.core.*
+import com.google.ar.core.ArCoreApk
+import com.google.ar.core.AugmentedFace
+import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
-import kotlinx.coroutines.launch
 
 object Global {
     var spawnPosZ = 0f
@@ -45,8 +40,8 @@ class GameActivity : AppCompatActivity() {
         const val MAX_FISHES_ON_SCREEN = 20
     }
     private lateinit var vm: ScoreViewModel
-    lateinit var arFragment: FaceArFragment
-    var faceNodeMap = HashMap<AugmentedFace, CatFace>()
+    private lateinit var arFragment: FaceArFragment
+    private var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
     private var isSpawningFishes = true
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +61,8 @@ class GameActivity : AppCompatActivity() {
         val repository = ScoreRepo(database.scoreDao())
 
         scene.addOnUpdateListener {
-            findViewById<TextView>(R.id.score).text = "Score: ${Global.score}"
+            val str = "Score: ${Global.score}"
+            findViewById<TextView>(R.id.score).text = str
 
             /* Ensuring that there is only 1 face being tracked at a time*/
             sceneView.session
@@ -75,7 +71,7 @@ class GameActivity : AppCompatActivity() {
                         if (!faceNodeMap.containsKey(f)) {
                             val faceNode = CatFace(f, this)
                             faceNode.setParent(scene)
-                            faceNodeMap.put(f, faceNode)
+                            faceNodeMap[f] = faceNode
                             Global.currCatFace = faceNode.characterNode
                         }
                     }
@@ -131,7 +127,7 @@ class GameActivity : AppCompatActivity() {
             //reinsert
             for (i in highScores.indices) {
                 if(i > 4) // insert top 5
-                    break;
+                    break
                 vm.insertScore(highScores[i])
                 Log.d("Display_HighScore", "${i + 1}:${highScores[i].value}")
             }
@@ -143,7 +139,7 @@ class GameActivity : AppCompatActivity() {
         if (l != null) {
             for (i in l.indices) {
                 if(i > 4) // display top 5
-                    break;
+                    break
                 Log.d("Display_HighScore", "${i + 1}:${l[i].value}")
             }
             Log.d("Display_HighScore", "Size:${l.count()}")
@@ -221,7 +217,7 @@ class GameActivity : AppCompatActivity() {
             ?.deviceConfigurationInfo
             ?.glEsVersion
 
-        openGlVersionString?.let { s ->
+        openGlVersionString?.let {
             if (java.lang.Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
                 Toast.makeText(this, "Sceneform requires OpenGL ES 3.0 or later", Toast.LENGTH_LONG)
                     .show()

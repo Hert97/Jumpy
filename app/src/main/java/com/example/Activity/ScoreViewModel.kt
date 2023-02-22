@@ -1,9 +1,7 @@
 package com.example.Activity
 
 import android.util.Log
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class ScoreViewModelFactory(private val repository: ScoreRepo) : ViewModelProvider.Factory {
