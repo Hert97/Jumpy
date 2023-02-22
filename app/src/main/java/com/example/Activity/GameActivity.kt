@@ -16,10 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.room.Room
-import com.example.FaceArFragment
-import com.example.CatFace
-import com.example.CatMath
-import com.example.FishObject
+import com.example.*
 import com.example.jumpy.R
 import com.google.ar.core.*
 import com.google.ar.sceneform.Node
@@ -54,6 +51,7 @@ class GameActivity : AppCompatActivity() {
     var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
     private var isSpawningFishes = true
+    var test = Global.score
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,12 +95,19 @@ class GameActivity : AppCompatActivity() {
 //                        }
 //                    }
                 }
+            if(test != Global.score)
+            {
+                SoundSystem.playSFX(this,R.raw.munch)
+                test = Global.score
+            }
         }
 
         findViewById<ImageButton>(R.id.settings_button).setOnClickListener {
             //Restart Button
             //Back to main menu Button
         }
+
+        ///////////////////// TESTING DATABASE /////////////////
         var test = Score(0,10)
         var test1 = Score(0,20)
         var test2 = Score(0,30)
@@ -110,11 +115,13 @@ class GameActivity : AppCompatActivity() {
         vm.insertScore(test)
         vm.insertScore(test1)
         vm.insertScore(test2)
+
         /*============================== Game logic ==============================*/
         val outValue = TypedValue()
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
 
+        ///////////////////  HIGHSCORE /////////////////
         vm.getAllScore().observe(this) {
             for (i in it.indices){
                 Log.d(
@@ -136,9 +143,12 @@ class GameActivity : AppCompatActivity() {
         Global.bottomPosY = Global.bottomPosY!! * -1f
         Log.d("Base Pos Y", Global.bottomPosY.toString())
 
-        startSpawningFishes()
+   //   SoundSystem.playBgMusic(this, R.raw.water)
+
+      startSpawningFishes()
         //spawnFishes(1)
     }
+
 
     private fun randomPosition(): Vector3? {
 
@@ -172,6 +182,7 @@ class GameActivity : AppCompatActivity() {
                 }
             }
         }, SPAWN_DELAY_MS)
+
     }
 
     private fun stopSpawningFishes() {
@@ -187,7 +198,7 @@ class GameActivity : AppCompatActivity() {
                 imageView.Setup()
                 imageView.setParent(arFragment.arSceneView.scene)
 
-                Global.score++
+               // Global.score++
                 //val newScore = Score(value = Global.score)
                 //db.scoreDao().insertScore(newScore)
 
@@ -222,6 +233,19 @@ class GameActivity : AppCompatActivity() {
         }
         return true
     }
+
+    //SOUND SYSTEM
+    override fun onPause() {
+        super.onPause()
+        SoundSystem.pauseAll()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        SoundSystem.resumeAll()
+    }
+
+
 
     private fun showHighScores() {
        // val scores = db.scoreDao().getAllScores().take(10)

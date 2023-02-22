@@ -112,6 +112,7 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
                     "FishObject",
                     "Fish touching cat"
                 )
+
                 destroy()
                 Global.score += 10
                 Log.d(
