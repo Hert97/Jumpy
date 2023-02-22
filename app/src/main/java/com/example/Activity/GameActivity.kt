@@ -12,8 +12,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.room.Room
 import com.example.FaceArFragment
@@ -25,6 +27,7 @@ import com.google.ar.core.*
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
+import kotlinx.coroutines.launch
 
 object Global {
     var spawnPosZ = 0f
@@ -46,7 +49,6 @@ class GameActivity : AppCompatActivity() {
     var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
     private var isSpawningFishes = true
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!checkIsSupportedDeviceOrFinish()) {
@@ -95,33 +97,58 @@ class GameActivity : AppCompatActivity() {
             //Restart Button
             //Back to main menu Button
         }
-        var test = Score(0,10)
-        var test1 = Score(0,20)
-        var test2 = Score(0,30)
+
+        // setting up viewmodel
         vm = ViewModelProvider(this, ScoreViewModelFactory(repository))[ScoreViewModel::class.java]
-        vm.insertScore(test)
-        vm.insertScore(test1)
-        vm.insertScore(test2)
+        vm.getAllScore().observe(this) {
+            Log.d("Database","Score has changed")
+        }
+
+
         /*============================== Game logic ==============================*/
         val outValue = TypedValue()
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
 
-        vm.getAllScore().observe(this) {
-            for (i in it.indices){
-                Log.d(
-                    "MainActivity",
-                    "Total score = ${it[i].value}"
-                )
+        startSpawningFishes()
 
-            }
 
-        }
-
-      startSpawningFishes()
         //spawnFishes(1)
     }
+    //TODO display as UI, call during gameover?? -yg
+    fun checkHighScore(score: Int) {
+        val highScores = vm.getAllScore().value?.toMutableList()
+        val currScore = Score(0,score)
+        if(highScores != null)  {
+            //insert high score as all are top 5
+            if(highScores.size < 5) {
+                vm.insertScore(currScore)
+                return
+            }
+            // sort highscore
+            highScores.sortByDescending { s-> s.value }
+            vm.deleteAll()
+            //reinsert
+            for (i in highScores.indices) {
+                if(i > 4) // insert top 5
+                    break;
+                vm.insertScore(highScores[i])
+                Log.d("Display_HighScore", "${i + 1}:${highScores[i].value}")
+            }
+        }
+        else  vm.insertScore(currScore)
 
+        //display highscore
+        val l = vm.getAllScore().value
+        if (l != null) {
+            for (i in l.indices) {
+                if(i > 4) // display top 5
+                    break;
+                Log.d("Display_HighScore", "${i + 1}:${l[i].value}")
+            }
+            Log.d("Display_HighScore", "Size:${l.count()}")
+        }
+    }
     private fun randomPosition(): Vector3? {
 
         val topRightPos = arFragment.arSceneView.arFrame?.camera?.imageIntrinsics?.let {
@@ -146,6 +173,8 @@ class GameActivity : AppCompatActivity() {
         isSpawningFishes = true
         handler.postDelayed(object : Runnable {
             override fun run() {
+                //checkHighScore(1000)
+
                 if (isSpawningFishes) {
                     spawnFishes(3)
                     handler.postDelayed(this, SPAWN_DELAY_MS)
@@ -203,12 +232,4 @@ class GameActivity : AppCompatActivity() {
         return true
     }
 
-    private fun showHighScores() {
-       // val scores = db.scoreDao().getAllScores().take(10)
-        //val scoreText = StringBuilder("High Scores:\n")
-       // for ((index, score) in scores.withIndex()) {
-        //    scoreText.append("${index + 1}. ${score.value}\n")
-       // }
-        //findViewById<TextView>(R.id.score).text = scoreText.toString()
-    }
 }

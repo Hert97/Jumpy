@@ -1,5 +1,6 @@
 package com.example.Activity
 
+import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.*
 import kotlinx.coroutines.flow.Flow
@@ -17,16 +18,20 @@ class ScoreViewModelFactory(private val repository: ScoreRepo) : ViewModelProvid
 
 class ScoreViewModel(private val repository: ScoreRepo) : ViewModel() {
 
-    private val alldigits: LiveData<List<Score>> = repository.allDigits.asLiveData()
+    private val allScore: LiveData<List<Score>> = repository.allScore.asLiveData()
 
 
-    fun deleteScore(digit: Score) = viewModelScope.launch {
-        repository.deleteScore(digit)
+    fun deleteScore(score: Score) = viewModelScope.launch {
+        repository.deleteScore(score)
+    }
+    fun deleteAll() = viewModelScope.launch {
+        repository.deleteAll()
     }
 
-    fun getAllScore() = alldigits
+    fun getAllScore() = allScore
 
-    fun insertScore(digit: Score) = viewModelScope.launch {
-        repository.insertScore(digit)
+    fun insertScore(score: Score) = viewModelScope.launch {
+        repository.insertScore(score)
+        Log.d("Insert_Score",score.value.toString())
     }
 }

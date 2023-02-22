@@ -6,11 +6,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ScoreDao {
     @Insert (onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertScore(digit: Score)
+    suspend fun insertScore(score: Score)
 
     @Query("SELECT * FROM scores ORDER BY value DESC")
     fun getAllScores(): Flow<List<Score>>
 
+    @Query("DELETE FROM scores")
+    suspend fun deleteAll()
+
     @Delete
-    suspend fun deleteScore(digit: Score)
+    suspend fun deleteScore(score: Score)
 }

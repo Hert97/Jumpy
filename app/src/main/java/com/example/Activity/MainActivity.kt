@@ -29,19 +29,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         val catImageView : ImageView = findViewById(R.id.mm_image_1)
 
-//        val context = this
-//        val resources = context.resources
-//        val drawableId = R.drawable.animation
-//
-//        val animDrawable = ResourcesCompat.getDrawable(resources, drawableId, null) as AnimationDrawable
-//        catImageView.setImageDrawable(animDrawable)
-//        animDrawable.start()
+    //        val context = this
+    //        val resources = context.resources
+    //        val drawableId = R.drawable.animation
+    //
+    //        val animDrawable = ResourcesCompat.getDrawable(resources, drawableId, null) as AnimationDrawable
+    //        catImageView.setImageDrawable(animDrawable)
+    //        animDrawable.start()
 
         val FRAME_DURATION = 1f //seconds
         val spriteSheet = BitmapFactory.decodeResource(resources, R.drawable.idle)
         val frames = Spritesheet.slice(spriteSheet, 1, 3)
         anime = Animator(resources, frames, FRAME_DURATION)
-//        val anime = Animator(catImageView, resources, frames, null)
+        //val anime = Animator(catImageView, resources, frames, null)
         anime.setImageView(catImageView)
         anime.start()
     }
@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         when (view.id) {
             R.id.button_play -> {
                 val intent = Intent(this, GameActivity::class.java)
-//                val intent = Intent(this, JumpyActivity::class.java)
                 startActivity(intent)
             }
             R.id.button_exit -> {
