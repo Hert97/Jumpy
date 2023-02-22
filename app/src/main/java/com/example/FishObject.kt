@@ -38,7 +38,7 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
         mArFragment = arFragment
 
         fishImageView = ImageView(context)
-        fishImageView.setImageResource(R.drawable.fish)
+        fishImageView.setImageResource(R.drawable.fish_25p)
 
         if (fishWidth == 0 || fishHeight == 0) {
             // Get screen size
@@ -46,18 +46,16 @@ class FishObject(context: Context, position: Vector3, arFragment: FaceArFragment
             (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
 
             // Set layout parameters of ImageView
-            val widthInPercentage = 4 // in %, e.g.5%
-            val heightInPercentage = 4 // in %, e.g.5%
+            val widthInPercentage = 2 // in %, e.g.5%
+            val heightInPercentage = 2// in %, e.g.5%
             fishWidth = displayMetrics.widthPixels * widthInPercentage / 100
             fishHeight = displayMetrics.heightPixels * heightInPercentage / 100
         }
 
-        val layoutParams = ConstraintLayout.LayoutParams(
+        fishImageView.layoutParams = ConstraintLayout.LayoutParams(
             fishWidth,
             fishHeight
         )
-
-        fishImageView.layoutParams = layoutParams
         gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
     }
 
