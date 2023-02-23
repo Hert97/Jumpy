@@ -7,6 +7,8 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
+import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -71,8 +73,18 @@ class GameActivity : AppCompatActivity() {
         val database = AppDatabase.getDatabase(this) //crashes here
         val repository = ScoreRepo(database.scoreDao())
 
+        val gameOverTextView = findViewById<TextView>(R.id.game_over)
+        val restartButton: Button = findViewById(R.id.restart_button)
+
         scene.addOnUpdateListener {
             findViewById<TextView>(R.id.score).text = "Score: ${Global.score}"
+
+           // TODO:: Change the losing condition
+            if (Global.score > 30)
+            {
+                gameOverTextView.setVisibility(View.VISIBLE);
+                restartButton.setVisibility(View.VISIBLE);
+            }
 
             /* Ensuring that there is only 1 face being tracked at a time*/
             sceneView.session
