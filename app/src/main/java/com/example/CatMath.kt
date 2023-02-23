@@ -34,6 +34,7 @@ class CatMath {
 
             return Vector3(
                 ((ndcPos.x + 1) / 2) * screenWidth,
+                //((ndcPos.y + 1) / 2) * screenHeight,
                 ((1 - ndcPos.y) / 2) * screenHeight,
                 ndcPos.z
             )
@@ -47,6 +48,7 @@ class CatMath {
             Matrix.invertM(invViewProjectionMatrix, 0, invViewProjectionMatrix, 0)
 
             val ndcPos = floatArrayOf(2 * (screenPos.x / scene.view.width) - 1, 1 - 2 * (screenPos.y / scene.view.height), screenPos.z, 1.0f)
+ //           val ndcPos = floatArrayOf(2 * (screenPos.x / scene.view.width) - 1, 2 * (screenPos.y / scene.view.height) - 1, screenPos.z, 1.0f)
             var clipPos = FloatArray(4)
             Matrix.multiplyMV(clipPos, 0, invViewProjectionMatrix, 0, ndcPos, 0)
 

@@ -128,12 +128,6 @@ class GameActivity : AppCompatActivity() {
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
 
-        FishObject.initializeFishProp(this)
-        for(i in 0 until Global.MAX_FISHES_ON_SCREEN)
-        {
-            Global.fishPool[i].initialize()
-        }
-
         vm.getAllScore().observe(this) {
             for (i in it.indices) {
                 Log.d(
@@ -183,9 +177,15 @@ class GameActivity : AppCompatActivity() {
 //                ?.get(0) ?: 0f)
 //            Global.bottomRightPos = Vector3(temp.first,temp.second, 0f)
 
+            Global.topLefttPos!!.x = -0.3f //hardcoded
 
             Global.hasInit = true
 
+            FishObject.initializeFishProp(this)
+            for(i in 0 until Global.MAX_FISHES_ON_SCREEN)
+            {
+                Global.fishPool[i].initialize()
+            }
             startSpawningFishes()
             //spawnFishes(3)
         }
@@ -223,16 +223,14 @@ class GameActivity : AppCompatActivity() {
 
     private fun spawnFishes(numObjects: Int) {
         var toSpawn = numObjects
-        for(i in 0 until Global.MAX_FISHES_ON_SCREEN)
+        for(i in 0 until Global.fishPool.size)
         {
             if(Global.numFishesOnScreen < Global.MAX_FISHES_ON_SCREEN &&
-                toSpawn > 0 && !Global.fishPool[i].isActive)
+                toSpawn > 0 && !Global.fishPool[i].activated)
             {
                 val position = randomPosition() ?: return
                 Global.fishPool[i].create(position)
-
-                val imageView = Global.fishPool[i]
-                imageView.setParent(arFragment.arSceneView.scene)
+                Global.fishPool[i].setParent(arFragment.arSceneView.scene)
 
                 //Global.score++
                 //val newScore = Score(value = Global.score)

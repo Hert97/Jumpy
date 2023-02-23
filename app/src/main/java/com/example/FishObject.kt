@@ -48,24 +48,25 @@ class FishObject : Node() {
     private var gravity = 0f // gravity acceleration in m/s^2
     private var velocity = 0f
     //private var id = -1
-    private var isActive = false
+    var activated = false
 
     fun initialize() {
         fishImageView = ImageView(mContext)
-        fishImageView.setImageResource(R.drawable.fish_25p)
 
         fishImageView.layoutParams = ConstraintLayout.LayoutParams(
             fishWidth,
             fishHeight
         )
+        activated = false
     }
 
     fun create(position: Vector3) {
         localPosition = Vector3(position.x, position.y, Global.spawnPosZ)
         gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
         //id = idCounter++
-        isActive = true
+        activated = true
 
+        fishImageView.setImageResource(R.drawable.fish_25p)
         // Build view renderable
         ViewRenderable.builder()
             .setView(mContext, fishImageView)
@@ -80,7 +81,7 @@ class FishObject : Node() {
     override fun onUpdate(frameTime: com.google.ar.sceneform.FrameTime?) {
         super.onUpdate(frameTime)
 
-        if(!isActive) return
+        if(!activated) return
 
         // update the position by applying gravity
         val dt = frameTime?.deltaSeconds ?: 0f
@@ -158,7 +159,7 @@ class FishObject : Node() {
 
         fishImageView.setImageDrawable(null)
         fishImageView.setImageBitmap(null)
-        isActive = false
+        activated = false
         parent?.removeChild(this) //remove this node from the parent "arscene"
     }
 

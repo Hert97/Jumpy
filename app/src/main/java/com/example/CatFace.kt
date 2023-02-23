@@ -24,6 +24,7 @@ class  CatFace(
     private lateinit var anime: Animator
     private lateinit var characterIV : ImageView
 
+    private var maxPosY = 0f
     override fun onActivate() {
         super.onActivate()
 
@@ -59,6 +60,8 @@ class  CatFace(
             }
         Global.catPosY = -0.18f// Global.bottomPosY
         characterNode?.worldPosition = Vector3(0f, Global.catPosY, Global.spawnPosZ)
+
+        maxPosY = Global.topLefttPos!!.x - Global.catHeight
     }
 
     override fun onUpdate(frameTime: FrameTime?) {
@@ -85,9 +88,16 @@ class  CatFace(
             // characterNode?.worldPosition = Vector3(0f, characterNode?.worldPosition?.y!!, Global.spawnPosZ)
         }
 
-//        if(Global.topLefttPos != null)
-//        {
-//        }
+        if(characterNode?.worldPosition?.y!! > Global.topLefttPos!!.x)
+        {
+            val offset = characterNode?.worldPosition?.y!! - maxPosY
+            characterNode?.worldPosition?.y = maxPosY
+
+            for(i in 0 until Global.MAX_FISHES_ON_SCREEN) {
+               Global.fishPool[i].worldPosition.y -= offset
+            }
+        }
+
 
         // Update the ImageView to show the current frame of the animation
         val uiRenderable = (characterNode?.renderable as? ViewRenderable)
