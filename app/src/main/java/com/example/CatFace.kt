@@ -12,10 +12,13 @@ import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.*
 import com.google.ar.sceneform.ux.AugmentedFaceNode
 import com.example.jumpy.R
+import com.google.ar.sceneform.Scene
+import com.google.ar.sceneform.SceneView
 
 class  CatFace(
     augmentedFace: AugmentedFace?,
     val context: Context,
+    scene: Scene,
 ) : AugmentedFaceNode(augmentedFace) {
 
     var characterNode: Node? = null
@@ -24,7 +27,7 @@ class  CatFace(
     private lateinit var anime: Animator
     private lateinit var characterIV : ImageView
 
-    private var maxPosY = 0f
+    private var maxPosY = 0f //cat max Y position for whole of the cat to still be shown on screen
     override fun onActivate() {
         super.onActivate()
 
@@ -61,7 +64,9 @@ class  CatFace(
         Global.catPosY = -0.18f// Global.bottomPosY
         characterNode?.worldPosition = Vector3(0f, Global.catPosY, Global.spawnPosZ)
 
-        maxPosY = Global.topLefttPos!!.x - Global.catHeight
+//        var screenCoord = CatMath.worldToScreenCoordinates(scene!!, Global.topLefttPos!!)
+//        screenCoord.y -= Global.catHeight
+        maxPosY = 0.05f//CatMath.screenToWorldCoordinates(scene!!, screenCoord).y
     }
 
     override fun onUpdate(frameTime: FrameTime?) {
@@ -74,7 +79,10 @@ class  CatFace(
         }
         else
         { //Not jumping
-            if(Global.catStartedJumping) Global.catVelocity += gravity * dt
+            if(Global.catStartedJumping && Global.catVelocity > -Global.catMaxVel / 2)
+            {
+                Global.catVelocity += gravity * dt
+            }
         }
 
         Log.d("jumpingVelocity", Global.catVelocity.toString())
@@ -85,16 +93,42 @@ class  CatFace(
             val nose = face.getRegionPose(AugmentedFace.RegionType.NOSE_TIP)
             Global.catPosY += Global.catVelocity * dt
             characterNode?.worldPosition = Vector3(nose.tx(), Global.catPosY, Global.spawnPosZ)
+            Log.d("velocity",  Global.catVelocity.toString())
+
             // characterNode?.worldPosition = Vector3(0f, characterNode?.worldPosition?.y!!, Global.spawnPosZ)
         }
 
-        if(characterNode?.worldPosition?.y!! > Global.topLefttPos!!.x)
+        Log.d("currworldpos", characterNode?.worldPosition?.y.toString())
+        Log.d("currtoppos", Global.topLefttPos!!.y.toString())
+        if(characterNode?.worldPosition?.y!! > maxPosY)
         {
+//            val offset = characterNode?.worldPosition?.y!! - maxPosY
+//            characterNode?.worldPosition = Vector3(characterNode?.worldPosition!!.x, maxPosY, Global.spawnPosZ)
+//            Log.d("NOWcurrworldpos", characterNode?.worldPosition?.y.toString())
+//            Log.d("offset", offset.toString())
+//
+//            for(i in 0 until Global.MAX_FISHES_ON_SCREEN) {
+//                val tempPos = Global.fishPool[i].worldPosition
+//               Global.fishPool[i].worldPosition = Vector3(tempPos.x, tempPos.y - offset, tempPos.z)
+//            }
+            // Calculate the offset to move the fish nodes
             val offset = characterNode?.worldPosition?.y!! - maxPosY
-            characterNode?.worldPosition?.y = maxPosY
+            val newPosition = Vector3(characterNode?.worldPosition!!.x, 0f, Global.spawnPosZ)
+
+            // Use lerp to move the object smoothly
+            val time = 0.08f // adjust this value to control the speed of the movement
+            val newPositionLerp = Vector3.lerp(characterNode?.worldPosition!!, newPosition, 1f)
+
+            characterNode?.worldPosition = newPositionLerp
 
             for(i in 0 until Global.MAX_FISHES_ON_SCREEN) {
-               Global.fishPool[i].worldPosition.y -= offset
+                val tempPos = Global.fishPool[i].worldPosition
+
+                // Use lerp to move the object smoothly
+                val newTempPos = Vector3(tempPos.x, tempPos.y - offset, tempPos.z)
+                val newTempPosLerp = Vector3.lerp(tempPos, newTempPos, time)
+
+                Global.fishPool[i].worldPosition = newTempPosLerp
             }
         }
 

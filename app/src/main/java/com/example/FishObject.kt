@@ -16,8 +16,8 @@ import com.google.ar.sceneform.rendering.ViewRenderable
 class FishObject : Node() {
 
     companion object {
-        const val minGravity = -.05f // Minimum gravity value
-        const val maxGravity = -.1f // Maximum gravity value
+        const val minGravity = -.01f // Minimum gravity value
+        const val maxGravity = -.05f // Maximum gravity value
 
         private var fishWidth: Int = 0
         private var fishHeight: Int = 0
@@ -65,6 +65,7 @@ class FishObject : Node() {
         gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
         //id = idCounter++
         activated = true
+        velocity = 0f
 
         fishImageView.setImageResource(R.drawable.fish_25p)
         // Build view renderable
@@ -125,8 +126,9 @@ class FishObject : Node() {
                 Global.catStartedJumping = true
                 if (!Global.catJumping) //cat not eating other fishes
                 {
-                    Global.catVelocity += Global.catJumpPower
                     Global.catJumping = true
+                    if(Global.catVelocity < Global.catMaxVel)
+                        Global.catVelocity += Global.catJumpPower
                 }
 
             }

@@ -12,7 +12,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.room.Update
 import com.example.FaceArFragment
 import com.example.CatFace
 import com.example.CatMath
@@ -20,7 +19,6 @@ import com.example.FishObject
 import com.example.jumpy.R
 import com.google.ar.core.*
 import com.google.ar.sceneform.Node
-import com.google.ar.sceneform.Scene.OnUpdateListener
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
 
@@ -44,7 +42,8 @@ object Global {
     var catJumping = false
     var catStartedJumping = false
 
-    const val catJumpPower = 0.35f
+    const val catJumpPower = 0.2f
+    const val catMaxVel = 0.4f
 
     var fishPool = Array(MAX_FISHES_ON_SCREEN) { FishObject() }
 }
@@ -52,7 +51,8 @@ object Global {
 class GameActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
-        const val SPAWN_DELAY_MS = 2000L //2 seconds
+//        const val SPAWN_DELAY_MS = 2000L //2 seconds
+        const val SPAWN_DELAY_MS = 500L
     }
 
     private lateinit var vm: ScoreViewModel
@@ -85,7 +85,7 @@ class GameActivity : AppCompatActivity() {
                 ?.getAllTrackables(AugmentedFace::class.java)?.let {
                     for (f in it) {
                         if (!faceNodeMap.containsKey(f)) {
-                            val faceNode = CatFace(f, this)
+                            val faceNode = CatFace(f, this, scene)
                             faceNode.setParent(scene)
                             faceNodeMap.put(f, faceNode)
                             Global.currCatFace = faceNode.characterNode
@@ -177,8 +177,7 @@ class GameActivity : AppCompatActivity() {
 //                ?.get(0) ?: 0f)
 //            Global.bottomRightPos = Vector3(temp.first,temp.second, 0f)
 
-            Global.topLefttPos!!.x = -0.3f //hardcoded
-
+            Global.topLefttPos!!.y = 0.25f //hardcoded
             Global.hasInit = true
 
             FishObject.initializeFishProp(this)
@@ -197,7 +196,7 @@ class GameActivity : AppCompatActivity() {
             val maxX = -Global.bottomRightPos!!.x
             val x = (Math.random() * (maxX - minX) + minX).toFloat()
 
-            val y = 0.25f //Temp hax, suppose to use -> Global.topLefttPos!!.y
+            val y = Global.topLefttPos!!.y
             Log.d("spawn pos x", x.toString())
             Log.d("spawn pos y", y.toString())
             return Vector3(x, y, Global.spawnPosZ)
@@ -210,7 +209,7 @@ class GameActivity : AppCompatActivity() {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 if (isSpawningFishes) {
-                    spawnFishes(3)
+                    spawnFishes(2)
                     handler.postDelayed(this, SPAWN_DELAY_MS)
                 }
             }
