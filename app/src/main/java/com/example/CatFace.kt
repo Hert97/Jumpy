@@ -23,6 +23,7 @@ class  CatFace(
 
     private lateinit var anime: Animator
     private lateinit var characterIV : ImageView
+
     override fun onActivate() {
         super.onActivate()
 
@@ -83,6 +84,10 @@ class  CatFace(
             characterNode?.worldPosition = Vector3(nose.tx(), Global.catPosY, Global.spawnPosZ)
             // characterNode?.worldPosition = Vector3(0f, characterNode?.worldPosition?.y!!, Global.spawnPosZ)
         }
+
+//        if(Global.topLefttPos != null)
+//        {
+//        }
 
         // Update the ImageView to show the current frame of the animation
         val uiRenderable = (characterNode?.renderable as? ViewRenderable)
