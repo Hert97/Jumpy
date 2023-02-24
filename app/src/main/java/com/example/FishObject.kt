@@ -50,6 +50,13 @@ class FishObject : Node() {
     //private var id = -1
     var activated = false
 
+    fun reset()
+    {
+        destroy()
+        initialize()
+    }
+
+
     fun initialize() {
         fishImageView = ImageView(mContext)
 
@@ -90,49 +97,7 @@ class FishObject : Node() {
         val pos = localPosition
         localPosition = Vector3(pos.x, pos.y + velocity * dt, pos.z)
 
-        //Check collision
-        if (Global.currCatFace != null) {
-            var objectAABB = AABB(
-                CatMath.worldToScreenCoordinates(scene!!, worldPosition),
-                fishWidth.toFloat(),
-                fishHeight.toFloat()
-            )
-            var catAABB = AABB(
-                CatMath.worldToScreenCoordinates(scene!!, Global.currCatFace!!.worldPosition),
-                Global.catWidth,
-                Global.catHeight
-            )
-//            Log.d("FishObject", "objectAABB = ${objectAABB.min.x}, ${objectAABB.min.y}, ${objectAABB.max.x}, ${objectAABB.max.y} ")
-//            Log.d("FishObject", "catAABB = ${catAABB.min.x}, ${catAABB.min.y}, ${catAABB.max.x}, ${catAABB.max.y}")
-//
-//            Log.d("FishObject", "objectWorldPos = ${worldPosition.x},${worldPosition.y},${worldPosition.z}")
-//            Log.d("FishObject", "catWorldPos = ${Global.currCatFace!!.worldPosition.x},${Global.currCatFace!!.worldPosition.y},${Global.currCatFace!!.worldPosition.z}")
-//
-//            Log.d("FishObject", "objectLocalPos = ${localPosition.x},${localPosition.y},${localPosition.z}")
-//            Log.d("FishObject", "catLocalPos = ${Global.currCatFace!!.localPosition.x},${Global.currCatFace!!.localPosition.y},${Global.currCatFace!!.localPosition.z}")
-
-            if (objectAABB.intersects(catAABB)) {
-                Log.d(
-                    "FishObject",
-                    "Fish touching cat"
-                )
-                destroy()
-                Global.score += 10
-                Log.d(
-                    "Score",
-                    Global.score.toString()
-                )
-
-                Global.catStartedJumping = true
-                if (!Global.catJumping) //cat not eating other fishes
-                {
-                    Global.catJumping = true
-                    if(Global.catVelocity < Global.catMaxVel)
-                        Global.catVelocity += Global.catJumpPower
-                }
-
-            }
-        }
+        catMunching()
 
         if (localPosition.y < -0.2f)
         {
@@ -165,5 +130,45 @@ class FishObject : Node() {
         parent?.removeChild(this) //remove this node from the parent "arscene"
     }
 
+    fun catMunching()
+    {
+        //Check collision
+        if (Global.currCatFace != null) {
+            var objectAABB = AABB(
+                CatMath.worldToScreenCoordinates(scene!!, worldPosition),
+                fishWidth.toFloat(),
+                fishHeight.toFloat()
+            )
+            var catAABB = AABB(
+                CatMath.worldToScreenCoordinates(scene!!, Global.currCatFace!!.worldPosition),
+                Global.catWidth,
+                Global.catHeight
+            )
+//            Log.d("FishObject", "objectAABB = ${objectAABB.min.x}, ${objectAABB.min.y}, ${objectAABB.max.x}, ${objectAABB.max.y} ")
+//            Log.d("FishObject", "catAABB = ${catAABB.min.x}, ${catAABB.min.y}, ${catAABB.max.x}, ${catAABB.max.y}")
+//
+//            Log.d("FishObject", "objectWorldPos = ${worldPosition.x},${worldPosition.y},${worldPosition.z}")
+//            Log.d("FishObject", "catWorldPos = ${Global.currCatFace!!.worldPosition.x},${Global.currCatFace!!.worldPosition.y},${Global.currCatFace!!.worldPosition.z}")
+//
+//            Log.d("FishObject", "objectLocalPos = ${localPosition.x},${localPosition.y},${localPosition.z}")
+//            Log.d("FishObject", "catLocalPos = ${Global.currCatFace!!.localPosition.x},${Global.currCatFace!!.localPosition.y},${Global.currCatFace!!.localPosition.z}")
+
+            if (objectAABB.intersects(catAABB))
+            {
+                Log.d( "FishObject","Cat munching" )
+                destroy()
+                Global.score += 10
+                Log.d( "Score", Global.score.toString() )
+
+                Global.catStartedJumping = true
+                if (!Global.catJumping) //cat not eating other fishes
+                {
+                    Global.catJumping = true
+                    if(Global.catVelocity < Global.catMaxVel)
+                        Global.catVelocity += Global.catJumpPower
+                }
+            }
+        }
+    }
 
 }

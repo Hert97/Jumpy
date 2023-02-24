@@ -24,26 +24,25 @@ import com.google.ar.sceneform.rendering.Renderable
 
 object Global {
     const val MAX_FISHES_ON_SCREEN = 20
+    const val catJumpPower = 0.2f
+    const val catMaxVel = 0.4f
 
-    var spawnPosZ = 0f
-    var numFishesOnScreen = 0
-    var currCatFace: Node? = null
+    var catReset = false
     var catWidth = 1f
     var catHeight = 1f
-    var score = 0
-
+    var spawnPosZ = 0f
+    var currCatFace: Node? = null
     var hasInit = false //Camera needs to be active to init the vars
     var topLefttPos: Vector3? = null
     var bottomRightPos: Vector3? = null
 
-    var catVelocity = 0f
+    var numFishesOnScreen = 0
+    var score = 0
     var catPosY = 0f
-
+    var catVelocity = 0f
     var catJumping = false
     var catStartedJumping = false
 
-    const val catJumpPower = 0.2f
-    const val catMaxVel = 0.4f
 
     var fishPool = Array(MAX_FISHES_ON_SCREEN) { FishObject() }
 }
@@ -85,9 +84,9 @@ class GameActivity : AppCompatActivity() {
                 ?.getAllTrackables(AugmentedFace::class.java)?.let {
                     for (f in it) {
                         if (!faceNodeMap.containsKey(f)) {
-                            val faceNode = CatFace(f, this, scene)
+                            val faceNode = CatFace(f, this)
                             faceNode.setParent(scene)
-                            faceNodeMap.put(f, faceNode)
+                            faceNodeMap[f] = faceNode
                             Global.currCatFace = faceNode.characterNode
                         }
                     }
@@ -111,6 +110,7 @@ class GameActivity : AppCompatActivity() {
 
         findViewById<ImageButton>(R.id.settings_button).setOnClickListener {
             //Restart Button
+            reset()
             //Back to main menu Button
         }
 
@@ -136,7 +136,6 @@ class GameActivity : AppCompatActivity() {
                 )
 
             }
-
         }
 
     }
@@ -266,6 +265,18 @@ class GameActivity : AppCompatActivity() {
             }
         }
         return true
+    }
+
+    private fun reset()
+    {
+        for(i in 0 until Global.fishPool.size)
+        {
+            Global.fishPool[i].reset()
+        }
+        Global.catReset = true
+
+        Global.numFishesOnScreen = 0
+        Global.score = 0
     }
 
     private fun showHighScores() {
