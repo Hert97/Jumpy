@@ -34,7 +34,7 @@ object Global {
     var hasInit = false
 
     var spawnPosZ = 0f
-    var camLerpSpeed = 0.5f
+    var camLerpSpeed = 2.0f
     var topLefttPos : Vector3? = null
     var bottomRightPos : Vector3? = null
 
