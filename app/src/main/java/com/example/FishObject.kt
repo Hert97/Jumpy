@@ -11,7 +11,6 @@ import com.example.jumpy.R
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ViewRenderable
-import kotlin.math.sqrt
 
 
 class FishObject : Node() {
