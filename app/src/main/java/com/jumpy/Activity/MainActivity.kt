@@ -19,15 +19,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_menu)
 
-        val buttonPlay : Button = findViewById(R.id.button_play)
-        val buttonExit : Button = findViewById(R.id.button_exit)
-        val buttonLeaderboard : Button = findViewById(R.id.button_leaderboard)
+        val buttonPlay : ImageView = findViewById(R.id.imagePlay)
+        //val buttonExit : Button = findViewById(R.id.button_exit)
+        //val buttonLeaderboard : Button = findViewById(R.id.button_leaderboard)
 
         buttonPlay.setOnClickListener(this)
-        buttonExit.setOnClickListener(this)
-        buttonLeaderboard.setOnClickListener(this)
+        //buttonExit.setOnClickListener(this)
+        //buttonLeaderboard.setOnClickListener(this)
 
-        val catImageView : ImageView = findViewById(R.id.mm_image_1)
+        //val catImageView : ImageView = findViewById(R.id.mm_image_1)
 
     //        val context = this
     //        val resources = context.resources
@@ -37,28 +37,28 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     //        catImageView.setImageDrawable(animDrawable)
     //        animDrawable.start()
 
-        val FRAME_DURATION = 1f //seconds
+        /*val FRAME_DURATION = 1f //seconds
         val spriteSheet = BitmapFactory.decodeResource(resources, R.drawable.idle)
         val frames = Spritesheet.slice(spriteSheet, 1, 3)
         anime = Animator(resources, frames, FRAME_DURATION)
         //val anime = Animator(catImageView, resources, frames, null)
         anime.setImageView(catImageView)
-        anime.start()
+        anime.start()*/
     }
 
     override fun onClick(view: View) {
         when (view.id) {
-            R.id.button_play -> {
+            R.id.imagePlay -> {
                 val intent = Intent(this, GameActivity::class.java)
                 startActivity(intent)
             }
-            R.id.button_exit -> {
+           /* R.id.button_exit -> {
                 finish()
             }
             R.id.button_leaderboard -> {
                 val intent = Intent(this, LeaderboardActivity::class.java)
                 startActivity(intent)
-            }
+            }*/
         }
     }
 }

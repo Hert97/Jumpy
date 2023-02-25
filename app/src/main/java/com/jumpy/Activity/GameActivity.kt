@@ -7,15 +7,14 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.jumpy.AR.CatFace
-import com.jumpy.CatMath
-import com.jumpy.AR.FaceArFragment
-import com.jumpy.Object.FishObject
 import com.example.jumpy.R
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.AugmentedFace
@@ -23,7 +22,12 @@ import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
+import com.jumpy.AR.CatFace
+import com.jumpy.AR.FaceArFragment
+import com.jumpy.CatMath
 import com.jumpy.Data.*
+import com.jumpy.Object.FishObject
+
 
 object Global {
     const val MAX_FISHES_ON_SCREEN = 20
@@ -133,7 +137,7 @@ class GameActivity : AppCompatActivity() {
 
         //startSpawningFishes()
         //spawnFishes(1)
-
+        checkHighScore(100)
     }
 
     fun onUpdate() {
@@ -208,6 +212,12 @@ class GameActivity : AppCompatActivity() {
             }
         }
         else  vm.insertScore(currScore)
+
+        // Inflate the layout XML file
+        val rootView = findViewById<FrameLayout>(android.R.id.content)
+        val inflater = LayoutInflater.from(this)
+        val view = inflater.inflate(R.layout.high_score, rootView, false)
+        rootView.addView(view)
 
         //display highscore
         val l = vm.getAllScore().value

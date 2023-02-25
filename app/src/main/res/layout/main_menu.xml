@@ -5,43 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Background view -->
+    <View
+        android:id="@+id/background_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_bg" />
+
+
     <ImageView
-        android:id="@+id/mm_image_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="45dp"
-        android:layout_marginEnd="46dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
+        android:id="@+id/imagePlay"
+        android:layout_width="92dp"
+        android:layout_height="71dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/background_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/eat" />
+        app:srcCompat="@drawable/icon_play" />
 
-    <Button
-        android:id="@+id/button_play"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:text="@string/play"
+    <ImageView
+        android:id="@+id/imageTitle"
+        android:layout_width="408dp"
+        android:layout_height="265dp"
+        android:layout_marginTop="64dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.333"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mm_image_1" />
+        app:layout_constraintTop_toTopOf="@+id/background_view"
+        app:srcCompat="@drawable/jumpy" />
 
-    <Button
-        android:id="@+id/button_leaderboard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/credit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_play" />
+   
 
-    <Button
-        android:id="@+id/button_exit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/exit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_leaderboard" />
 </androidx.constraintlayout.widget.ConstraintLayout>
