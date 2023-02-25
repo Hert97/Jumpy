@@ -1,6 +1,5 @@
-package com.jumpy.Activity
+package com.jumpy.activity
 
-//import com.example.JumpyActivity
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle

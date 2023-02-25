@@ -1,4 +1,4 @@
-package com.jumpy.Data
+package com.jumpy.data
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow

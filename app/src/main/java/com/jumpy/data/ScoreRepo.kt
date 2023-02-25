@@ -1,4 +1,4 @@
-package com.jumpy.Data
+package com.jumpy.data
 
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.Flow
