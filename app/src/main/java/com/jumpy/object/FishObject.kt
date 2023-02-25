@@ -181,8 +181,9 @@ class FishObject : Node() {
                 if (!cat.isJumping) //cat not eating other fishes
                 {
                     cat.isJumping = true
+                    cat.physics.acceleration +=  10.0f
                     //if(Global.catVelocity < Global.catMaxVel)
-                    cat.physics.velocity += calculateJumpVelocity(1.0f, cat.physics.velocity, dt)
+                    // cat.physics.velocity += calculateJumpVelocity(1.0f, cat.physics.velocity, dt)
 
                     /*if(Global.catVelocity < Global.catMaxVel)
                         Global.catVelocity += Global.catJumpPower*/

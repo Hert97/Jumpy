@@ -6,8 +6,8 @@ import com.google.ar.sceneform.math.Vector3
 class Physics (_gravity : Float)
 {
     private val gravity : Float
-    var gravityAcc = 0.0f //Accumulator
-
+    var accelerationAcc = 0.0f //Accumulator
+    var acceleration = 0.0f
     var velocity = 0.0f
 
     init
@@ -18,14 +18,14 @@ class Physics (_gravity : Float)
     fun reset()
     {
         velocity = 0.0f
-        gravityAcc = 0.0f
+        accelerationAcc = 0.0f
+        accelerationAcc = 0.0f
     }
-
     fun update(frameTime: FrameTime?) {
         val dt = frameTime?.deltaSeconds ?: 0f
-
-        gravityAcc += gravity * dt
-        velocity += gravityAcc * dt
+        acceleration += gravity * dt
+        accelerationAcc += acceleration * dt
+        velocity += accelerationAcc * dt
     }
 
     fun applyVelocity(frameTime: FrameTime?, position : Vector3) : Vector3
