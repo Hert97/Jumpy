@@ -14,6 +14,8 @@ import com.google.ar.sceneform.FrameTime
 import com.google.ar.sceneform.math.Vector3
 import com.jumpy.Spritesheet
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sign
 
 class CatObject : Node() {
@@ -33,7 +35,8 @@ class CatObject : Node() {
     private val animeFrameDuration = 0.2f //seconds
 
     //Game Logic
-    private var clampPosY = 0.05f //cat max Y position for whole of the cat to still be shown on screen
+    private var clampPosY = -0.05f //cat max Y position for whole of the cat to still be shown on screen
+    private var originY = -0.18f
     var startedJumping = false
     var isJumping = false
 
@@ -66,7 +69,7 @@ class CatObject : Node() {
     fun reset() {
         startedJumping = false
         isJumping = false
-        setPosY(-0.18f) // Global.bottomPosY
+        setPosY(originY) // Global.bottomPosY
         physics.reset()
         startIdleAnim()
     }
@@ -157,28 +160,44 @@ class CatObject : Node() {
                 physics.update(frameTime)
             }
         }
-        setPos(physics.applyVelocity(frameTime,getPos()))
-
+        // clamp position to stay on screen
+        val calculatedPos = physics.applyVelocity(frameTime,getPos())
+        calculatedPos.y = min(clampPosY, max(originY - 0.1f,  calculatedPos.y ))
+        // Use lerp to move the object smoothly
+        val newPositionLerp = Vector3.lerp(getPos(), calculatedPos, dt * Global.camLerpSpeed)
+        setPos(newPositionLerp)
         //======================== Camera ========================
         val catPos = getPos()
-        if (catPos.y > clampPosY) //If cat reaches beyond the top of the screen
+        if (catPos.y >= clampPosY) //If cat reaches top of the screen scroll the fishes
         {
             // Calculate the offset to move the fish nodes
-            val offset = abs(catPos.y - clampPosY) * -sign(physics.velocity)
-            val newPosition = Vector3(catPos.x, 0f, catPos.z)
-
+            //val offset = abs(catPos.y - originY) * -sign(physics.velocity)
+            //val newPosition = Vector3(catPos.x, 0f, catPos.z)
             // Use lerp to move the object smoothly
             // val time = 0.08f // adjust this value to control the speed of the movement
-            val newPositionLerp = Vector3.lerp(catPos, newPosition, dt * Global.camLerpSpeed)
+            //val newPositionLerp = Vector3.lerp(catPos, newPosition, dt * Global.camLerpSpeed)
             //Log.d("DT:",dt.toString())
-            setPos(newPositionLerp)
+            //setPos(newPositionLerp)
 
+            // increase acceleration for scrolling effect
             for (i in 0 until Global.MAX_FISHES_ON_SCREEN) {
-                val tempPos = Global.fishPool[i].worldPosition
+                /*val tempPos = Global.fishPool[i].worldPosition
                 // Use lerp to move the object smoothly
                 val newTempPos = Vector3(tempPos.x, tempPos.y + offset, tempPos.z)
                 val newTempPosLerp = Vector3.lerp(tempPos, newTempPos,  dt * Global.camLerpSpeed)
-                Global.fishPool[i].worldPosition = newTempPosLerp
+                Global.fishPool[i].worldPosition = newTempPosLerp*/
+
+                if( !Global.fishPool[i].activated)
+                    continue
+
+                val fishPos = Global.fishPool[i].worldPosition
+                val v = Vector3.subtract(fishPos,catPos)
+                val dist2 = Vector3.dot(v,v)
+                //reset fishes which are too far away because they will never die as cat is also going away from the fish
+                if(dist2 > 10.0f &&  sign(physics.velocity) == sign(Global.fishPool[i].physics.velocity)) {
+                    Global.fishPool[i].destroy()
+                }
+                Global.fishPool[i].physics.acceleration += -sign(physics.acceleration) * 0.3f
             }
         }
 
