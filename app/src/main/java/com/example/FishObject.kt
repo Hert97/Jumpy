@@ -47,6 +47,8 @@ class FishObject : Node() {
     private lateinit var fishImageView: ImageView
     private var gravity = 0f // gravity acceleration in m/s^2
     private var velocity = 0f
+    private var dt = 0.0f
+    private var gravityAcc = 0.0f
     //private var id = -1
     var activated = false
 
@@ -85,7 +87,7 @@ class FishObject : Node() {
                 null
             }
     }
-    var dt = 0.0f
+
     override fun onUpdate(frameTime: com.google.ar.sceneform.FrameTime?) {
         super.onUpdate(frameTime)
 
@@ -93,7 +95,8 @@ class FishObject : Node() {
 
         // update the position by applying gravity
         dt = frameTime?.deltaSeconds ?: 0f
-        velocity += gravity * dt
+        gravityAcc += gravity * dt
+        velocity += gravityAcc * dt
         val pos = localPosition
         localPosition = Vector3(pos.x, pos.y + velocity * dt, pos.z)
 
@@ -123,7 +126,7 @@ class FishObject : Node() {
             "FishObject",
             "Fish removed from screen. numFishesOnScreen = ${Global.numFishesOnScreen}"
         )
-
+        gravityAcc = 0.0f
         fishImageView.setImageDrawable(null)
         fishImageView.setImageBitmap(null)
         activated = false
@@ -134,6 +137,7 @@ class FishObject : Node() {
         Log.d("Velocity:",v.toString())
         return v
     }
+
     fun catMunching()
     {
         //Check collision
@@ -168,8 +172,8 @@ class FishObject : Node() {
                 if (!Global.catJumping) //cat not eating other fishes
                 {
                     Global.catJumping = true
-                    if(Global.catVelocity < Global.catMaxVel)
-                        Global.catVelocity += calculateJumpVelocity(0.005f, Global.catVelocity,dt)
+                    //if(Global.catVelocity < Global.catMaxVel)
+                        Global.catVelocity += calculateJumpVelocity(1.0f, Global.catVelocity,dt)
 
                     /*if(Global.catVelocity < Global.catMaxVel)
                         Global.catVelocity += Global.catJumpPower*/

@@ -29,6 +29,8 @@ object Global {
     const val catJumpPower = 0.2f
     const val catMaxVel = 0.4f
 
+    var catAccAmuluator = 0.0f
+    var catSpeed = 0.5f
     var catReset = false
     var catWidth = 1f
     var catHeight = 1f
@@ -180,6 +182,8 @@ class GameActivity : AppCompatActivity() {
             startSpawningFishes()
             //spawnFishes(3)
         }
+
+        //Global.catVelocity += Global.catAccAmuluator * dt
     }
     //TODO display as UI, call during gameover?? -yg
     fun checkHighScore(score: Int) {
