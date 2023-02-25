@@ -1,4 +1,4 @@
-package com.example
+package com.jumpy.AR
 
 import android.os.Bundle
 import android.view.LayoutInflater

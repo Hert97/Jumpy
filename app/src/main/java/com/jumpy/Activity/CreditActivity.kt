@@ -1,9 +1,8 @@
-package com.example.Activity
+package com.jumpy.Activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.jumpy.R
-
 
 
 class CreditActivity : AppCompatActivity() {

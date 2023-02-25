@@ -1,4 +1,4 @@
-package com.example.Activity
+package com.jumpy.Activity
 
 //import com.example.JumpyActivity
 import android.content.Intent
@@ -8,8 +8,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.Animator
-import com.example.Spritesheet
+import com.jumpy.Animator
+import com.jumpy.Spritesheet
 import com.example.jumpy.R
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {

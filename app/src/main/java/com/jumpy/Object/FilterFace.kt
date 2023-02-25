@@ -1,10 +1,10 @@
-package com.example
+package com.jumpy.AR
 
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.util.Log
 import android.widget.ImageView
-import com.example.Activity.Global
+import com.jumpy.Activity.Global
 import com.example.jumpy.R
 import com.google.ar.core.AugmentedFace
 import com.google.ar.sceneform.FrameTime
@@ -12,9 +12,9 @@ import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ViewRenderable
 import com.google.ar.sceneform.ux.AugmentedFaceNode
+import com.jumpy.Animator
+import com.jumpy.Spritesheet
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.sign
 
 class CatFace(

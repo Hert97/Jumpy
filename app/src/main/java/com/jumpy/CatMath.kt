@@ -1,4 +1,4 @@
-package com.example
+package com.jumpy
 
 import android.opengl.Matrix
 import com.google.ar.sceneform.Scene

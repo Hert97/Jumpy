@@ -1,4 +1,4 @@
-package com.example
+package com.jumpy.Object
 
 import android.app.Activity
 import android.content.Context
@@ -6,11 +6,13 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.example.Activity.Global
+import com.jumpy.Activity.Global
 import com.example.jumpy.R
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ViewRenderable
+import com.jumpy.AABB
+import com.jumpy.CatMath
 
 
 class FishObject : Node() {

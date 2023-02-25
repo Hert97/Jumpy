@@ -1,4 +1,4 @@
-package com.example
+package com.jumpy
 
 import com.google.ar.sceneform.math.Vector3
 

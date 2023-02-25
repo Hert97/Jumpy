@@ -1,4 +1,4 @@
-package com.example.Activity
+package com.jumpy.Data
 
 import android.util.Log
 import androidx.lifecycle.*

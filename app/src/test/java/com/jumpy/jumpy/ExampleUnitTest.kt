@@ -1,4 +1,4 @@
-package com.example.jumpy
+package com.jumpy.jumpy
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.example
+package com.jumpy
 
 import android.content.res.Resources
 import android.graphics.Bitmap

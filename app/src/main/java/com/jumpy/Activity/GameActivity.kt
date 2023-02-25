@@ -1,4 +1,4 @@
-package com.example.Activity
+package com.jumpy.Activity
 
 import android.app.ActivityManager
 import android.content.Context
@@ -12,10 +12,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.CatFace
-import com.example.CatMath
-import com.example.FaceArFragment
-import com.example.FishObject
+import com.jumpy.AR.CatFace
+import com.jumpy.CatMath
+import com.jumpy.AR.FaceArFragment
+import com.jumpy.Object.FishObject
 import com.example.jumpy.R
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.AugmentedFace
@@ -23,6 +23,7 @@ import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
+import com.jumpy.Data.*
 
 object Global {
     const val MAX_FISHES_ON_SCREEN = 20

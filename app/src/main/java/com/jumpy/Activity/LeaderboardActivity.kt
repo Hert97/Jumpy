@@ -1,4 +1,4 @@
-package com.example.Activity
+package com.jumpy.Activity
 
 import android.os.Bundle
 import android.view.View
