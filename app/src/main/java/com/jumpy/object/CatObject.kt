@@ -128,17 +128,33 @@ class CatObject : Node() {
 
         val dt = frameTime?.deltaSeconds ?: 0f
 
+
+        //========================= Dead ==========================
+        if (getPos().y < -0.2f)
+        {
+            Log.d("Cat Ded", "Cat Dieded")
+        }
+
         //======================== Jumping ========================
-        if (isJumping)
-        { //is jumping
-            isJumping = false
-            characterIV.setBackgroundResource(R.drawable.eat)
+        if(physics.velocity <= Global.catIdlePhase)
+        {
+            startIdleAnim()
+        }
+        else if(physics.velocity < Global.catJumpPhase)
+        {
+            characterIV.setBackgroundResource(R.drawable.jump)
         }
         else
-        { //Not jumping
-            if (startedJumping && physics.velocity > -Global.catMaxVel / 2) {
+        {
+            characterIV.setBackgroundResource(R.drawable.eat)
+        }
+        if (isJumping) { //is jumping
+            isJumping = false
+            //Global.catJumping = false
+
+        } else { //Not jumping
+            if (startedJumping) {
                 physics.update(frameTime)
-                characterIV.setBackgroundResource(R.drawable.jump)
             }
         }
         setPos(physics.applyVelocity(frameTime,getPos()))
