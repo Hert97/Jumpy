@@ -11,6 +11,7 @@ import com.example.jumpy.R
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ViewRenderable
+import kotlin.math.sqrt
 
 
 class FishObject : Node() {
@@ -85,14 +86,14 @@ class FishObject : Node() {
                 null
             }
     }
-
+    var dt = 0.0f
     override fun onUpdate(frameTime: com.google.ar.sceneform.FrameTime?) {
         super.onUpdate(frameTime)
 
         if(!activated) return
 
         // update the position by applying gravity
-        val dt = frameTime?.deltaSeconds ?: 0f
+        dt = frameTime?.deltaSeconds ?: 0f
         velocity += gravity * dt
         val pos = localPosition
         localPosition = Vector3(pos.x, pos.y + velocity * dt, pos.z)
@@ -129,7 +130,11 @@ class FishObject : Node() {
         activated = false
         parent?.removeChild(this) //remove this node from the parent "arscene"
     }
-
+    private fun calculateJumpVelocity(h: Float, v0 : Float , t : Float): Float {
+        val v =  (h / t) * 2.0f - v0
+        Log.d("Velocity:",v.toString())
+        return v
+    }
     fun catMunching()
     {
         //Check collision
@@ -155,17 +160,20 @@ class FishObject : Node() {
 
             if (objectAABB.intersects(catAABB))
             {
-                Log.d( "FishObject","Cat munching" )
+                //Log.d( "FishObject","Cat munching" )
                 destroy()
                 Global.score += 10
-                Log.d( "Score", Global.score.toString() )
+                //Log.d( "Score", Global.score.toString() )
 
                 Global.catStartedJumping = true
                 if (!Global.catJumping) //cat not eating other fishes
                 {
                     Global.catJumping = true
                     if(Global.catVelocity < Global.catMaxVel)
-                        Global.catVelocity += Global.catJumpPower
+                        Global.catVelocity += calculateJumpVelocity(0.005f, Global.catVelocity,dt)
+
+                    /*if(Global.catVelocity < Global.catMaxVel)
+                        Global.catVelocity += Global.catJumpPower*/
                 }
             }
         }

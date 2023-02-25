@@ -12,9 +12,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.FaceArFragment
 import com.example.CatFace
 import com.example.CatMath
+import com.example.FaceArFragment
 import com.example.FishObject
 import com.example.jumpy.R
 import com.google.ar.core.ArCoreApk
@@ -53,7 +53,7 @@ class GameActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
 //        const val SPAWN_DELAY_MS = 2000L //2 seconds
-        const val SPAWN_DELAY_MS = 500L
+        const val SPAWN_DELAY_MS = 2000L
     }
 
     private lateinit var vm: ScoreViewModel
@@ -234,9 +234,8 @@ class GameActivity : AppCompatActivity() {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 //checkHighScore(1000)
-
                 if (isSpawningFishes) {
-                    spawnFishes(2)
+                    spawnFishes(4)
                     handler.postDelayed(this, SPAWN_DELAY_MS)
                 }
             }
