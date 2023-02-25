@@ -15,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.FaceArFragment
 import com.example.CatFace
 import com.example.CatMath
-import com.example.FaceArFragment
 import com.example.FishObject
 import com.example.jumpy.R
 import com.google.ar.core.ArCoreApk
