@@ -30,20 +30,18 @@ class Animator {
     private var isLooping: Boolean = false
     private var enterFadeDuration: Float = 0f
     private var exitFadeDuration: Float = 0f
+    private var mFrameDuration : Int = 200 //0.2 seconds (default)
 
     constructor(
         resources: Resources, //needa pass the resources from the activity classes to here
         sprites: List<Bitmap>, //List of images
         frameDuration: Float? //In Seconds. If "null", default frame duration will be used
     ) {
-        // If "null" is passed in for frameDuration parameter,
-        // default frameduration of 200 will be used
-        var fDuration = 200 // 0.2 seconds
-        if (frameDuration != null) fDuration = (frameDuration * 1000f).toInt()
+        if (frameDuration != null) mFrameDuration = (frameDuration * 1000f).toInt()
 
         anime = AnimationDrawable()
         sprites.forEach { bitmap ->
-            anime.addFrame(BitmapDrawable(resources, bitmap), fDuration)
+            anime.addFrame(BitmapDrawable(resources, bitmap), mFrameDuration)
         }
     }
 

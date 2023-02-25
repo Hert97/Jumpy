@@ -1,4 +1,4 @@
-package com.jumpy.Data
+package com.jumpy.data
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room

@@ -1,4 +1,4 @@
-package com.jumpy.Object
+package com.jumpy.`object`
 
 import android.app.Activity
 import android.content.Context
@@ -6,17 +6,18 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.jumpy.Activity.Global
+import com.jumpy.activity.Global
 import com.example.jumpy.R
+import com.google.ar.sceneform.FrameTime
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ViewRenderable
 import com.jumpy.AABB
 import com.jumpy.CatMath
+import com.jumpy.Physics
 
 
 class FishObject : Node() {
-
     companion object {
         const val minGravity = -.01f // Minimum gravity value
         const val maxGravity = -.05f // Maximum gravity value
@@ -47,19 +48,39 @@ class FishObject : Node() {
     }
 
     private lateinit var fishImageView: ImageView
-    private var gravity = 0f // gravity acceleration in m/s^2
-    private var velocity = 0f
-    private var dt = 0.0f
-    private var gravityAcc = 0.0f
+    private lateinit var physics : Physics
     //private var id = -1
     var activated = false
+
+    //---------------------------------------------------
+    fun getPos() : Vector3
+    {
+        return worldPosition
+    }
+    fun setPos(vec : Vector3)
+    {
+        worldPosition = vec
+    }
+    fun setPosx(x : Float)
+    {
+        worldPosition = Vector3(x, worldPosition.y, worldPosition.z)
+    }
+    fun setPosY(y : Float)
+    {
+        worldPosition = Vector3(worldPosition.x, y, worldPosition.z)
+    }
+    fun setPosZ(z : Float)
+    {
+        worldPosition = Vector3(worldPosition.x, worldPosition.y, z)
+    }
+    //---------------------------------------------------
 
     fun reset()
     {
         destroy()
         initialize()
+        physics.reset()
     }
-
 
     fun initialize() {
         fishImageView = ImageView(mContext)
@@ -73,10 +94,10 @@ class FishObject : Node() {
 
     fun create(position: Vector3) {
         localPosition = Vector3(position.x, position.y, Global.spawnPosZ)
-        gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
+        val gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
+        physics = Physics(gravity)
         //id = idCounter++
         activated = true
-        velocity = 0f
 
         fishImageView.setImageResource(R.drawable.fish_25p)
         // Build view renderable
@@ -90,35 +111,18 @@ class FishObject : Node() {
             }
     }
 
-    override fun onUpdate(frameTime: com.google.ar.sceneform.FrameTime?) {
+    override fun onUpdate(frameTime: FrameTime?) {
         super.onUpdate(frameTime)
+        if (!activated) return
 
-        if(!activated) return
+        physics.update(frameTime)
+        setPos(physics.applyVelocity(frameTime, getPos()))
 
-        // update the position by applying gravity
-        dt = frameTime?.deltaSeconds ?: 0f
-        gravityAcc += gravity * dt
-        velocity += gravityAcc * dt
-        val pos = localPosition
-        localPosition = Vector3(pos.x, pos.y + velocity * dt, pos.z)
+        catMunching(frameTime)
 
-        catMunching()
-
-        if (localPosition.y < -0.2f)
-        {
+        if (localPosition.y < -0.2f) {
             destroy()
         }
-//        if (Global.bottomRightPos != null) {
-//            if (worldPosition.y < Global.bottomRightPos!!.y) {
-//                //destroy()
-//            }
-//        }
-//        else
-//        {
-//            if (localPosition.y < -1f) {
-//                //destroy()
-//            }
-//        }
     }
 
     fun destroy() {
@@ -128,31 +132,34 @@ class FishObject : Node() {
             "FishObject",
             "Fish removed from screen. numFishesOnScreen = ${Global.numFishesOnScreen}"
         )
-        gravityAcc = 0.0f
         fishImageView.setImageDrawable(null)
         fishImageView.setImageBitmap(null)
         activated = false
         parent?.removeChild(this) //remove this node from the parent "arscene"
     }
+
     private fun calculateJumpVelocity(h: Float, v0 : Float , t : Float): Float {
         val v =  (h / t) * 2.0f - v0
         Log.d("Velocity:",v.toString())
         return v
     }
 
-    fun catMunching()
+    fun catMunching(frameTime: FrameTime?)
     {
+        val dt = frameTime?.deltaSeconds ?: 0f
+
+        val cat = Global.catObject
         //Check collision
-        if (Global.currCatFace != null) {
+        if (cat != null) {
             var objectAABB = AABB(
                 CatMath.worldToScreenCoordinates(scene!!, worldPosition),
                 fishWidth.toFloat(),
                 fishHeight.toFloat()
             )
             var catAABB = AABB(
-                CatMath.worldToScreenCoordinates(scene!!, Global.currCatFace!!.worldPosition),
-                Global.catWidth,
-                Global.catHeight
+                CatMath.worldToScreenCoordinates(scene!!, cat.getPos()),
+                cat.catWidth,
+                cat.catHeight
             )
 //            Log.d("FishObject", "objectAABB = ${objectAABB.min.x}, ${objectAABB.min.y}, ${objectAABB.max.x}, ${objectAABB.max.y} ")
 //            Log.d("FishObject", "catAABB = ${catAABB.min.x}, ${catAABB.min.y}, ${catAABB.max.x}, ${catAABB.max.y}")
@@ -170,12 +177,12 @@ class FishObject : Node() {
                 Global.score += 10
                 //Log.d( "Score", Global.score.toString() )
 
-                Global.catStartedJumping = true
-                if (!Global.catJumping) //cat not eating other fishes
+                cat.startedJumping = true
+                if (!cat.isJumping) //cat not eating other fishes
                 {
-                    Global.catJumping = true
+                    cat.isJumping = true
                     //if(Global.catVelocity < Global.catMaxVel)
-                        Global.catVelocity += calculateJumpVelocity(1.0f, Global.catVelocity,dt)
+                    cat.physics.velocity += calculateJumpVelocity(1.0f, cat.physics.velocity, dt)
 
                     /*if(Global.catVelocity < Global.catMaxVel)
                         Global.catVelocity += Global.catJumpPower*/

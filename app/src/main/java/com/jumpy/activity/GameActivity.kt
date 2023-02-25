@@ -1,4 +1,4 @@
-package com.jumpy.Activity
+package com.jumpy.activity
 
 import android.app.ActivityManager
 import android.content.Context
@@ -12,10 +12,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.jumpy.AR.CatFace
+import com.jumpy.ar.CatFace
 import com.jumpy.CatMath
-import com.jumpy.AR.FaceArFragment
-import com.jumpy.Object.FishObject
+import com.jumpy.ar.FaceArFragment
+import com.jumpy.`object`.FishObject
 import com.example.jumpy.R
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.AugmentedFace
@@ -23,32 +23,25 @@ import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
-import com.jumpy.Data.*
+import com.jumpy.data.*
+import com.jumpy.`object`.CatObject
 
 object Global {
     const val MAX_FISHES_ON_SCREEN = 20
     const val catJumpPower = 0.2f
     const val catMaxVel = 0.4f
 
-    var catAccAmuluator = 0.0f
-    var catSpeed = 0.5f
-    var catReset = false
-    var catWidth = 1f
-    var catHeight = 1f
+    var hasInit = false
+
     var spawnPosZ = 0f
-    var currCatFace: Node? = null
-    var hasInit = false //Camera needs to be active to init the vars
-    var topLefttPos: Vector3? = null
-    var bottomRightPos: Vector3? = null
+    var camLerpSpeed = 0.5f
+    var topLefttPos : Vector3? = null
+    var bottomRightPos : Vector3? = null
 
     var numFishesOnScreen = 0
     var score = 0
-    var catPosY = 0f
-    var catVelocity = 0f
-    var catJumping = false
-    var catStartedJumping = false
 
-
+    var catObject : CatObject? = null
     var fishPool = Array(MAX_FISHES_ON_SCREEN) { FishObject() }
 }
 
@@ -92,7 +85,7 @@ class GameActivity : AppCompatActivity() {
                             val faceNode = CatFace(f, this)
                             faceNode.setParent(scene)
                             faceNodeMap[f] = faceNode
-                            Global.currCatFace = faceNode.characterNode
+                            Global.catObject = faceNode.catNode
                         }
                     }
                     // Remove any AugmentedFaceNodes associated with an AugmentedFace that stopped tracking.
@@ -305,7 +298,7 @@ class GameActivity : AppCompatActivity() {
         {
             Global.fishPool[i].reset()
         }
-        Global.catReset = true
+        Global.catObject?.reset()
 
         Global.numFishesOnScreen = 0
         Global.score = 0

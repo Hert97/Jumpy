@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/face_fragment"
-        android:name="com.jumpy.AR.FaceArFragment"
+        android:name="com.jumpy.ar.FaceArFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

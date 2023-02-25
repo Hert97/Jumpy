@@ -1,4 +1,4 @@
-package com.jumpy.Activity
+package com.jumpy.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
