@@ -7,11 +7,9 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.jumpy.ar.CatFace
@@ -55,6 +53,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private lateinit var vm: ScoreViewModel
+    private lateinit var listView: ListView
     private lateinit var arFragment: FaceArFragment
     private var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
@@ -75,18 +74,29 @@ class GameActivity : AppCompatActivity() {
         val database = AppDatabase.getDatabase(this) //crashes here
         val repository = ScoreRepo(database.scoreDao())
 
-        val gameOverTextView = findViewById<TextView>(R.id.game_over)
+        val gameOverTextView = findViewById<TextView>(R.id.gameover)
         val restartButton: Button = findViewById(R.id.restart_button)
+        listView = findViewById(R.id.leaderboard)
+        val headerView = LayoutInflater.from(this).inflate(R.layout.list_item_score, null)
+        listView.addHeaderView(headerView)
+
 
         scene.addOnUpdateListener {
             val str = "Score: ${Global.score}"
             findViewById<TextView>(R.id.score).text = str
 
-           // TODO:: Change the losing condition
-            if (Global.score > 30)
+            val allScores = vm.getAllScore().value
+            val topScores = allScores?.take(5)
+            val adapter = topScores?.let { ScoreAdapter(this, it.toList()) }
+            listView.adapter = adapter
+
+            // TODO:: Change the losing condition
+            if (Global.score > 9)
             {
                 gameOverTextView.setVisibility(View.VISIBLE);
                 restartButton.setVisibility(View.VISIBLE);
+                listView.setVisibility(View.VISIBLE);
+
             }
 
             /* Ensuring that there is only 1 face being tracked at a time*/
