@@ -2,8 +2,10 @@ package com.jumpy.`object`
 
 import android.app.Activity
 import android.content.Context
+import android.opengl.Visibility
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.jumpy.activity.Global
@@ -15,6 +17,7 @@ import com.google.ar.sceneform.rendering.ViewRenderable
 import com.jumpy.AABB
 import com.jumpy.CatMath
 import com.jumpy.Physics
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.InvisibleFake
 
 
 class FishObject : Node() {
@@ -48,7 +51,7 @@ class FishObject : Node() {
     }
 
     private lateinit var fishImageView: ImageView
-    private lateinit var physics : Physics
+    var physics : Physics
     //private var id = -1
     var activated = false
 
@@ -91,7 +94,9 @@ class FishObject : Node() {
         )
         activated = false
     }
-
+    init {
+        physics = Physics(0.0f)
+    }
     fun create(position: Vector3) {
         localPosition = Vector3(position.x, position.y, Global.spawnPosZ)
         val gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
@@ -135,14 +140,9 @@ class FishObject : Node() {
         fishImageView.setImageDrawable(null)
         fishImageView.setImageBitmap(null)
         activated = false
-        parent?.removeChild(this) //remove this node from the parent "arscene"
+       // parent?.removeChild(this) //remove this node from the parent "arscene"
     }
 
-    private fun calculateJumpVelocity(h: Float, v0 : Float , t : Float): Float {
-        val v =  (h / t) * 2.0f - v0
-        Log.d("Velocity:",v.toString())
-        return v
-    }
 
     fun catMunching(frameTime: FrameTime?)
     {
@@ -182,24 +182,7 @@ class FishObject : Node() {
                 {
                     cat.isJumping = true
                     cat.physics.acceleration +=  10.0f
-                    //if(Global.catVelocity < Global.catMaxVel)
-                    // cat.physics.velocity += calculateJumpVelocity(1.0f, cat.physics.velocity, dt)
 
-                    /*if(Global.catVelocity < Global.catMaxVel)
-                        Global.catVelocity += Global.catJumpPower*/
-             //   if(Global.catVelocity <= 0f)
-              //  {
-             //       Log.d( "FishObject","Cat munching" )
-             //       destroy()
-             //       Global.score += 10
-//Log.d( "Score", Global.score.toString() )
-
-                //    Global.catStartedJumping = true
-                //    if (!Global.catJumping) //cat not eating other fishes
-                //    {
-                //        Global.catJumping = true
-               //       Global.catVelocity = Global.catJumpPower
-                //    }
                 }
             }
         }
