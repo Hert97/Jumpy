@@ -111,7 +111,6 @@ class CatObject : Node() {
     fun initialize(context: Context)
     {
         initAnim(context)
-        setPosZ(Global.spawnPosZ)
         reset()
     }
     //---------------------------------------------------

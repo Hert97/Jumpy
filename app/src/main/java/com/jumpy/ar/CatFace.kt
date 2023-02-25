@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.ar.core.AugmentedFace
 import com.google.ar.sceneform.FrameTime
 import com.google.ar.sceneform.ux.AugmentedFaceNode
+import com.jumpy.activity.Global
 import com.jumpy.`object`.CatObject
 
 class CatFace(
@@ -34,5 +35,6 @@ class CatFace(
 //        if(finalY > 0.0)
 //            finalY = 0.0f
         if(noseX != null) catNode.setPosx(noseX!!)
+        catNode.setPosZ(Global.spawnPosZ)
     }
 }
