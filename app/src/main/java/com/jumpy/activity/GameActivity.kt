@@ -54,6 +54,7 @@ class GameActivity : AppCompatActivity() {
 
     private lateinit var vm: ScoreViewModel
     private lateinit var listView: ListView
+    private lateinit var currScore: TextView
     private lateinit var arFragment: FaceArFragment
     private var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
@@ -77,6 +78,7 @@ class GameActivity : AppCompatActivity() {
         val gameOverTextView = findViewById<TextView>(R.id.gameover)
         val restartButton: Button = findViewById(R.id.restart_button)
         listView = findViewById(R.id.leaderboard)
+        currScore = findViewById(R.id.curr_score)
         val headerView = LayoutInflater.from(this).inflate(R.layout.list_item_score, null)
         listView.addHeaderView(headerView)
 
@@ -90,13 +92,15 @@ class GameActivity : AppCompatActivity() {
             val adapter = topScores?.let { ScoreAdapter(this, it.toList()) }
             listView.adapter = adapter
 
+
             // TODO:: Change the losing condition
             if (Global.score > 9)
             {
                 gameOverTextView.setVisibility(View.VISIBLE);
                 restartButton.setVisibility(View.VISIBLE);
                 listView.setVisibility(View.VISIBLE);
-
+                currScore.setVisibility(View.VISIBLE);
+                currScore.setText("Your score is ${Global.score}")
             }
 
             /* Ensuring that there is only 1 face being tracked at a time*/

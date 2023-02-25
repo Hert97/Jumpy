@@ -2,5 +2,5 @@
 <resources>
     <color name="divider_color">#810541</color>
     <color name="gameover_background">#FA2A55</color>
-
+    <color name="blue">#B7CEEC</color>
 </resources>
