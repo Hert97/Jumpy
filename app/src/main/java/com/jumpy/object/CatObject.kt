@@ -32,7 +32,7 @@ class CatObject : Node() {
     //Animation
     private lateinit var anime: Animator
     private var animeStarted = false
-    private val animeFrameDuration = 0.2f //seconds
+    private val animeFrameDuration = 0.4f //seconds
 
     //Game Logic
     private var clampPosY = -0.05f //cat max Y position for whole of the cat to still be shown on screen
@@ -76,7 +76,7 @@ class CatObject : Node() {
 
     fun startIdleAnim() {
         if(!initialized) return
-        characterIV.setBackgroundDrawable(anime.getAnime())
+        characterIV.setImageDrawable(anime.getAnime())
         // Start the animation
         anime.start()
     }
@@ -145,11 +145,11 @@ class CatObject : Node() {
         }
         else if(physics.velocity < Global.catJumpPhase)
         {
-            characterIV.setBackgroundResource(R.drawable.jump)
+            characterIV.setImageResource(R.drawable.jump)
         }
         else
         {
-            characterIV.setBackgroundResource(R.drawable.eat)
+            characterIV.setImageResource(R.drawable.eat)
         }
         if (isJumping) { //is jumping
             isJumping = false
