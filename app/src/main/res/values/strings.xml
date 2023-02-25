@@ -32,8 +32,8 @@
 
     <string name="searching_planes" translatable="false">Searching for surfaces...</string>
     <string name="waiting_taps" translatable="false">Tap on a surface to place an object.</string>
-    <string name="play">Play</string>
-    <string name="credit">Credit</string>
-    <string name="exit">Exit</string>
+    <string name="play">PLAY</string>
+    <string name="leaderboard">LEADERBOARD</string>
+    <string name="exit">EXIT</string>
 
 </resources>
