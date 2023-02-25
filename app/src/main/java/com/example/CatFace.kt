@@ -18,36 +18,20 @@ class CatFace(
     val context: Context,
 ) : AugmentedFaceNode(augmentedFace) {
     var characterNode: Node? = null
-    private val gravity = -1f // gravity acceleration in m/s^2
+    private val gravity = -0.1f // gravity acceleration in m/s^2
+    private val gravityCap = -0.5f
 
     private lateinit var anime: Animator
-    private lateinit var characterIV: ImageView
+    private var characterIV: ImageView? = null
 
     private var maxPosY = 0f //cat max Y position for whole of the cat to still be shown on screen
     fun startIdleAnim() {
-        ViewRenderable.builder()
-            .setView(context, R.layout.character_layout)
-            .build()
-            .thenAccept { uiRenderable: ViewRenderable ->
-                Log.d("enter", "start idle anim 2")
-                uiRenderable.isShadowCaster = false
-                uiRenderable.isShadowReceiver = false
-                characterNode?.renderable = uiRenderable
-
-                characterIV =
-                    (characterNode?.renderable as ViewRenderable).view?.findViewById(R.id.characterIV)!!
-
-                Global.catWidth = characterIV.layoutParams.width.toFloat()
-                Global.catHeight = characterIV.layoutParams.height.toFloat()
-
-                characterIV.setBackgroundDrawable(anime.getAnime())
-                // Start the animation
-                anime.start()
-            }
-            .exceptionally { throwable: Throwable? ->
-                Log.e("CatFace", "Could not create ui element", throwable)
-                null
-            }
+        if(characterIV != null)
+        {
+            characterIV?.setBackgroundDrawable(anime.getAnime())
+            // Start the animation
+            anime.start()
+        }
     }
 
     fun reset() {
@@ -71,8 +55,27 @@ class CatFace(
         characterNode = Node()
         characterNode?.setParent(this)
 
-        Log.d("here", "here")
-        startIdleAnim()
+        ViewRenderable.builder()
+            .setView(context, R.layout.character_layout)
+            .build()
+            .thenAccept { uiRenderable: ViewRenderable ->
+                uiRenderable.isShadowCaster = false
+                uiRenderable.isShadowReceiver = false
+                characterNode?.renderable = uiRenderable
+
+                characterIV =
+                    (characterNode?.renderable as ViewRenderable).view?.findViewById(R.id.characterIV)!!
+
+                Global.catWidth = characterIV?.layoutParams?.width!!.toFloat()
+                Global.catHeight = characterIV?.layoutParams?.height!!.toFloat()
+
+                startIdleAnim()
+            }
+            .exceptionally { throwable: Throwable? ->
+                Log.e("CatFace", "Could not create ui element", throwable)
+                null
+            }
+
 
         Global.catPosY = -0.18f// Global.bottomPosY
         characterNode?.worldPosition = Vector3(0f, Global.catPosY, Global.spawnPosZ)
@@ -91,15 +94,32 @@ class CatFace(
             return
         }
 
+        if (characterNode?.localPosition?.y!! < -0.2f)
+        {
+            Log.d("Cat Ded", "Cat Dieded")
+        }
+
+
+        if(Global.catVelocity <= Global.catIdlePhase)
+        {
+            startIdleAnim()
+        }
+        else if(Global.catVelocity < Global.catJumpPhase)
+        {
+            characterIV?.setBackgroundResource(R.drawable.jump)
+        }
+        else
+        {
+            characterIV?.setBackgroundResource(R.drawable.eat)
+        }
         val dt = frameTime?.deltaSeconds ?: 0f
         if (Global.catJumping) { //is jumping
             Global.catJumping = false
-            characterIV.setBackgroundResource(R.drawable.eat)
+            //Global.catJumping = false
 
         } else { //Not jumping
-            if (Global.catStartedJumping && Global.catVelocity > -Global.catMaxVel / 2) {
+            if (Global.catStartedJumping && Global.catVelocity > gravityCap) {
                 Global.catVelocity += gravity * dt
-                characterIV.setBackgroundResource(R.drawable.jump)
             }
         }
 
