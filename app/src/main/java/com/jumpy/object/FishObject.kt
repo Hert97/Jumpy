@@ -186,6 +186,19 @@ class FishObject : Node() {
 
                     /*if(Global.catVelocity < Global.catMaxVel)
                         Global.catVelocity += Global.catJumpPower*/
+             //   if(Global.catVelocity <= 0f)
+              //  {
+             //       Log.d( "FishObject","Cat munching" )
+             //       destroy()
+             //       Global.score += 10
+//Log.d( "Score", Global.score.toString() )
+
+                //    Global.catStartedJumping = true
+                //    if (!Global.catJumping) //cat not eating other fishes
+                //    {
+                //        Global.catJumping = true
+               //       Global.catVelocity = Global.catJumpPower
+                //    }
                 }
             }
         }

@@ -28,8 +28,9 @@ import com.jumpy.`object`.CatObject
 
 object Global {
     const val MAX_FISHES_ON_SCREEN = 20
-    const val catJumpPower = 0.2f
-    const val catMaxVel = 0.4f
+    const val catJumpPower = 0.15f
+    const val catJumpPhase = 0.05
+    const val catIdlePhase = 0f
 
     var hasInit = false
 
@@ -49,7 +50,7 @@ class GameActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
 //        const val SPAWN_DELAY_MS = 2000L //2 seconds
-        const val SPAWN_DELAY_MS = 2000L
+        const val SPAWN_DELAY_MS = 700L
     }
 
     private lateinit var vm: ScoreViewModel
@@ -233,7 +234,7 @@ class GameActivity : AppCompatActivity() {
             override fun run() {
                 //checkHighScore(1000)
                 if (isSpawningFishes) {
-                    spawnFishes(4)
+                    spawnFishes(1)
                     handler.postDelayed(this, SPAWN_DELAY_MS)
                 }
             }
