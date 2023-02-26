@@ -41,9 +41,14 @@ class CatObject : Node() {
     var currPosY = -0.5f
     var startedJumping = false
     var isJumping = false
+    var isDed = false
 
 
     //---------------------------------------------------
+    fun ifIsDed() : Boolean
+    {
+        return isDed
+    }
     fun getPos() : Vector3
     {
         return worldPosition
@@ -69,11 +74,13 @@ class CatObject : Node() {
 
     //---------------------------------------------------
     fun reset() {
+        //Global.gameOver = false
         startedJumping = false
         isJumping = false
         setPosY(originY) // Global.bottomPosY
         physics.reset()
         startIdleAnim()
+        isDed = false
     }
 
     fun startIdleAnim() {
@@ -139,7 +146,8 @@ class CatObject : Node() {
         //========================= Dead ==========================
         if (getPos().y < -0.2f)
         {
-            Log.d("Cat Ded", "Cat Dieded")
+            Log.d("GameOver", "Cat Dieded")
+            Global.gameOver = true
         }
 
         //======================== Jumping ========================
@@ -168,7 +176,7 @@ class CatObject : Node() {
         val calculatedPos = physics.applyVelocity(frameTime,getPos())
         calculatedPos.y = min(clampPosY, max(originY - 0.1f,  calculatedPos.y ))
         // Use lerp to move the object smoothly
-        val newPositionLerp = Vector3.lerp(getPos(), calculatedPos, dt * Global.camLerpSpeed)
+        val newPositionLerp = Vector3.lerp(getPos(), calculatedPos, dt  * Global.camLerpSpeed )
         setPos(newPositionLerp)
         //======================== Camera ========================
         val catPos = getPos()

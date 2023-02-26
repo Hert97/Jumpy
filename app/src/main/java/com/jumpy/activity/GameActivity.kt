@@ -2,19 +2,16 @@ package com.jumpy.activity
 
 import android.app.ActivityManager
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
-import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
-import com.example.SoundSystem
 import com.jumpy.ar.CatFace
 import com.jumpy.CatMath
 import com.jumpy.ar.FaceArFragment
@@ -37,17 +34,17 @@ object Global {
     var hasInit = false
 
     var spawnPosZ = 0f
-    var camLerpSpeed = 2.0f
+    var camLerpSpeed = 3.0f
     var topLefttPos : Vector3? = null
     var bottomRightPos : Vector3? = null
-
-    var gamePaused = false
 
     var numFishesOnScreen = 0
     var score = 0
 
     var catObject : CatObject? = null
     var fishPool = Array(MAX_FISHES_ON_SCREEN) { FishObject() }
+
+    var gameOver = false
 }
 
 class GameActivity : AppCompatActivity() {
@@ -58,16 +55,21 @@ class GameActivity : AppCompatActivity() {
     }
 
     private lateinit var vm: ScoreViewModel
+    private lateinit var listView: ListView
+    private lateinit var currScore: TextView
     private lateinit var arFragment: FaceArFragment
     private var faceNodeMap = HashMap<AugmentedFace, CatFace>()
     private val handler = Handler(Looper.getMainLooper())
     private var isSpawningFishes = true
+    private var checkHighScore = false // add highscore to database flag
+
+    private lateinit var gameOverTextView : TextView
+    private lateinit var restartButton: Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!checkIsSupportedDeviceOrFinish()) {
             return
         }
-        SoundSystem.playBgMusic(this, R.raw.bgm )
 
         setContentView(R.layout.activity_ui)
         arFragment = supportFragmentManager.findFragmentById(R.id.face_fragment) as FaceArFragment
@@ -79,9 +81,38 @@ class GameActivity : AppCompatActivity() {
         val database = AppDatabase.getDatabase(this) //crashes here
         val repository = ScoreRepo(database.scoreDao())
 
+        gameOverTextView = findViewById(R.id.gameover)
+        restartButton = findViewById(R.id.restart_button)
+
+
+        listView = findViewById(R.id.leaderboard)
+        currScore = findViewById(R.id.curr_score)
+        val headerView = LayoutInflater.from(this).inflate(R.layout.list_item_score, null)
+        listView.addHeaderView(headerView)
+
+        //reset game btn
+        restartButton.setOnClickListener{
+            reset()
+        }
+
         scene.addOnUpdateListener {
             val str = "Score: ${Global.score}"
             findViewById<TextView>(R.id.score).text = str
+
+            val allScores = vm.getAllScore().value
+            val topScores = allScores?.take(5)
+            val adapter = topScores?.let { ScoreAdapter(this, it.toList()) }
+            listView.adapter = adapter
+
+            //game over
+            if (Global.gameOver)
+            {
+                if(checkHighScore) {
+                    checkHighScore(Global.score)
+                    checkHighScore = false
+                }
+                displayHighScore(true)
+            }
 
             /* Ensuring that there is only 1 face being tracked at a time*/
             sceneView.session
@@ -107,45 +138,16 @@ class GameActivity : AppCompatActivity() {
                     }
                 }
             if (!Global.hasInit) {
-                onUpdate()
+                if (Global.catObject?.ifIsDed() == false)
+                    onUpdate()
             }
         }
 
 
         findViewById<ImageButton>(R.id.settings_button).setOnClickListener {
-            Global.gamePaused = true
-
-            val popupLayout = LayoutInflater.from(this).inflate(R.layout.pause_menu, null) as LinearLayout
-            val popupWindow = PopupWindow(
-                popupLayout,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                true
-            )
-
-            val restartBtn = popupLayout.findViewById<Button>(R.id.pauseRestartBtn)
-            val returnMenuBtn = popupLayout.findViewById<Button>(R.id.pauseReturnMenu)
-
-            restartBtn.setOnClickListener()
-            {
-                reset()
-                popupWindow.dismiss() // Close the popup window when restart button is clicked
-            }
-
-            returnMenuBtn.setOnClickListener()
-            {
-                val intent = Intent(this@GameActivity, MainActivity::class.java)
-                startActivity(intent)
-                popupWindow.dismiss() // Close the popup window when return to menu button is clicked
-            }
-
-            // Show the popup window
-            popupWindow.showAtLocation(findViewById(R.id.game_container), Gravity.CENTER, 0, 0)
-
-            //Popup gone
-            popupWindow.setOnDismissListener {
-                Global.gamePaused = false
-            }
+            //Restart Button
+            reset()
+            //Back to main menu Button
         }
 
         // setting up viewmodel
@@ -217,37 +219,24 @@ class GameActivity : AppCompatActivity() {
     }
     //TODO display as UI, call during gameover?? -yg
     fun checkHighScore(score: Int) {
-        val highScores = vm.getAllScore().value?.toMutableList()
-        val currScore = Score(0,score)
-        if(highScores != null)  {
-            //insert high score as all are top 5
-            if(highScores.size < 5) {
-                vm.insertScore(currScore)
-                return
-            }
-            // sort highscore
-            highScores.sortByDescending { s-> s.value }
-            vm.deleteAll()
-            //reinsert
-            for (i in highScores.indices) {
-                if(i > 4) // insert top 5
-                    break
-                vm.insertScore(highScores[i])
-                Log.d("Display_HighScore", "${i + 1}:${highScores[i].value}")
-            }
-        }
-        else  vm.insertScore(currScore)
 
-        //display highscore
-        val l = vm.getAllScore().value
-        if (l != null) {
-            for (i in l.indices) {
-                if(i > 4) // display top 5
-                    break
-                Log.d("Display_HighScore", "${i + 1}:${l[i].value}")
-            }
-            Log.d("Display_HighScore", "Size:${l.count()}")
+        val currScore = Score(0, score)
+        vm.insertScore(currScore)
+
+        // Get top 5 scores
+        vm.getAllScore().observeForever { scores ->
+            val top5 = scores.sortedByDescending { it.value }.take(5)
+
+            // delete all scores except the top 5
+            scores.filter { it !in top5 }.forEach { vm.deleteScore(it) }
+
+            // debug display top 5 scores
+            /*top5.forEachIndexed { index, score ->
+                Log.d("Display_HighScore", "${index + 1}:${score.value}")
+            }*/
         }
+
+
     }
     private fun randomPosition(): Vector3? {
         if (Global.topLefttPos != null && Global.bottomRightPos != null) {
@@ -327,9 +316,20 @@ class GameActivity : AppCompatActivity() {
         }
         return true
     }
-
+    private fun displayHighScore(display : Boolean) {
+        var visiblity = View.VISIBLE
+        if(!display)
+            visiblity = View.INVISIBLE
+        gameOverTextView.visibility = visiblity;
+        restartButton.visibility = visiblity;
+        listView.visibility = visiblity;
+        currScore.visibility = visiblity;
+    }
     private fun reset()
     {
+        //reset for session to check highscore
+        checkHighScore = true
+        Global.gameOver = false
         for(i in 0 until Global.fishPool.size)
         {
             Global.fishPool[i].reset()
@@ -338,15 +338,8 @@ class GameActivity : AppCompatActivity() {
 
         Global.numFishesOnScreen = 0
         Global.score = 0
+
+        displayHighScore(false)
     }
 
-    override fun onPause() {
-        super.onPause()
-        SoundSystem.pauseAll()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        SoundSystem.resumeAll()
-    }
 }
