@@ -2,16 +2,20 @@ package com.jumpy.activity
 
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
-import android.view.LayoutInflater
 import android.view.View
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
+import com.example.SoundSystem
 import com.jumpy.ar.CatFace
 import com.jumpy.CatMath
 import com.jumpy.ar.FaceArFragment
@@ -27,6 +31,7 @@ import com.jumpy.`object`.CatObject
 
 object Global {
     const val MAX_FISHES_ON_SCREEN = 20
+    const val SPAWN_RATE = 1
     const val catJumpPower = 0.15f
     const val catJumpPhase = 0.05
     const val catIdlePhase = 0f
@@ -37,6 +42,8 @@ object Global {
     var camLerpSpeed = 3.0f
     var topLefttPos : Vector3? = null
     var bottomRightPos : Vector3? = null
+
+    var gamePaused = false
 
     var numFishesOnScreen = 0
     var score = 0
@@ -70,6 +77,7 @@ class GameActivity : AppCompatActivity() {
         if (!checkIsSupportedDeviceOrFinish()) {
             return
         }
+        SoundSystem.playBgMusic(this, R.raw.ingamebgm )
 
         setContentView(R.layout.activity_ui)
         arFragment = supportFragmentManager.findFragmentById(R.id.face_fragment) as FaceArFragment
@@ -123,7 +131,7 @@ class GameActivity : AppCompatActivity() {
                             faceNode.setParent(scene)
                             faceNodeMap[f] = faceNode
                             Global.catObject = faceNode.catNode
-                        }
+                            }
                     }
                     // Remove any AugmentedFaceNodes associated with an AugmentedFace that stopped tracking.
                     val iter = faceNodeMap.entries.iterator()
@@ -145,9 +153,39 @@ class GameActivity : AppCompatActivity() {
 
 
         findViewById<ImageButton>(R.id.settings_button).setOnClickListener {
-            //Restart Button
-            reset()
-            //Back to main menu Button
+            Global.gamePaused = true
+
+            val popupLayout = LayoutInflater.from(this).inflate(R.layout.pause_menu, null) as LinearLayout
+            val popupWindow = PopupWindow(
+                popupLayout,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                true
+            )
+
+            val restartBtn = popupLayout.findViewById<Button>(R.id.pauseRestartBtn)
+            val returnMenuBtn = popupLayout.findViewById<Button>(R.id.pauseReturnMenu)
+
+            restartBtn.setOnClickListener()
+            {
+                reset()
+                popupWindow.dismiss() // Close the popup window when restart button is clicked
+            }
+
+            returnMenuBtn.setOnClickListener()
+            {
+                val intent = Intent(this@GameActivity, MainActivity::class.java)
+                startActivity(intent)
+                popupWindow.dismiss() // Close the popup window when return to menu button is clicked
+            }
+
+            // Show the popup window
+            popupWindow.showAtLocation(findViewById(R.id.game_container), Gravity.CENTER, 0, 0)
+
+            //Popup gone
+            popupWindow.setOnDismissListener {
+                Global.gamePaused = false
+            }
         }
 
         // setting up viewmodel
@@ -161,9 +199,6 @@ class GameActivity : AppCompatActivity() {
         val outValue = TypedValue()
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
-
-        //startSpawningFishes()
-        //spawnFishes(1)
 
     }
 
@@ -257,8 +292,8 @@ class GameActivity : AppCompatActivity() {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 //checkHighScore(1000)
-                if (isSpawningFishes) {
-                    spawnFishes(1)
+                if (!Global.gamePaused && isSpawningFishes) {
+                    spawnFishes(Global.SPAWN_RATE)
                     handler.postDelayed(this, SPAWN_DELAY_MS)
                 }
             }
@@ -330,6 +365,7 @@ class GameActivity : AppCompatActivity() {
     {
         //reset for session to check highscore
         checkHighScore = true
+        Global.gamePaused = false
         Global.gameOver = false
         for(i in 0 until Global.fishPool.size)
         {
@@ -343,4 +379,13 @@ class GameActivity : AppCompatActivity() {
         displayHighScore(false)
     }
 
+    override fun onPause() {
+        super.onPause()
+        SoundSystem.pauseAll()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        SoundSystem.resumeAll()
+    }
 }
