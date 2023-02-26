@@ -21,8 +21,8 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingLeft="50dp"
-        android:paddingRight="50dp">
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp">
 
         <Button
             android:id="@+id/pauseRestartBtn"
@@ -40,13 +40,23 @@
             android:id="@+id/pauseReturnMenu"
             android:layout_width="match_parent"
             android:layout_height="80dp"
+            android:layout_marginBottom="30dp"
             android:background="@drawable/rounded_bg"
             android:fontFamily="@font/comic_neue_bold_italic"
             android:gravity="center"
-            android:text="RETURN TO MAIN MENU"
+            android:text="RETURN TO MENU"
             android:textColor="#000000"
             android:textSize="24sp" />
 
+        <TextView
+            android:id="@+id/resumeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/comic_neue_bold_italic"
+            android:gravity="center"
+            android:text="PRESS ANYWHERE ELSE TO RESUME"
+            android:textSize="20sp" />
     </LinearLayout>
+
 
 </LinearLayout>
