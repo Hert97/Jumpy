@@ -182,7 +182,7 @@ class FishObject : Node() {
                 cat.startedJumping = true
                 if (!cat.isJumping && !cat.isEating) //cat not eating other fishes
                 {
-                    //Log.d( "FishObject","Cat munching" )
+                    Log.d( "FishObject","Cat munching" )
                     destroy()
                     Global.score += 10
                     //Log.d( "Score", Global.score.toString() )

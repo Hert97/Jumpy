@@ -190,7 +190,6 @@ class CatObject : Node() {
             characterIV.setImageResource(R.drawable.eat)
         }
 
-
         // clamp position to stay on screen
         val calculatedPos = physics.applyVelocity(frameTime,getPos())
         calculatedPos.y = min(clampPosY, max(originY - 0.1f,  calculatedPos.y ))
@@ -200,8 +199,8 @@ class CatObject : Node() {
         val catPos = getPos()
         if (catPos.y >= clampPosY) //If cat reaches top of the screen scroll the fishes
         {
-            val newPositionLerp = Vector3.lerp(getPos(), calculatedPos, dt  * Global.camLerpSpeed )
-            setPos(newPositionLerp)
+            //val newPositionLerp = Vector3.lerp(getPos(), calculatedPos, dt  * Global.camLerpSpeed )
+            setPos( Vector3(catPos.x,originY,catPos.z))
 
             Log.d("scrolling", "true")
             // Calculate the offset to move the fish nodes
