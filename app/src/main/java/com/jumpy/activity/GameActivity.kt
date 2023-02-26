@@ -92,9 +92,10 @@ class GameActivity : AppCompatActivity() {
             val adapter = topScores?.let { ScoreAdapter(this, it.toList()) }
             listView.adapter = adapter
 
-            // TODO:: Change the losing condition
+            // If cat is ded
             if (Global.catObject?.ifIsDed() == true)
             {
+                checkHighScore(Global.score)
                 gameOverTextView.setVisibility(View.VISIBLE);
                 restartButton.setVisibility(View.VISIBLE);
                 listView.setVisibility(View.VISIBLE);
