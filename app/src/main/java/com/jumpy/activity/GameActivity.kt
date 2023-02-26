@@ -31,6 +31,7 @@ import com.jumpy.`object`.CatObject
 
 object Global {
     const val MAX_FISHES_ON_SCREEN = 20
+    const val SPAWN_RATE = 1
     const val catJumpPower = 0.15f
     const val catJumpPhase = 0.05
     const val catIdlePhase = 0f
@@ -199,9 +200,6 @@ class GameActivity : AppCompatActivity() {
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
 
-        //startSpawningFishes()
-        //spawnFishes(1)
-
     }
 
     fun onUpdate() {
@@ -294,8 +292,8 @@ class GameActivity : AppCompatActivity() {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 //checkHighScore(1000)
-                if (isSpawningFishes) {
-                    spawnFishes(1)
+                if (!Global.gamePaused && isSpawningFishes) {
+                    spawnFishes(Global.SPAWN_RATE)
                     handler.postDelayed(this, SPAWN_DELAY_MS)
                 }
             }
