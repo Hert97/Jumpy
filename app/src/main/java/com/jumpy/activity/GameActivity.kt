@@ -30,11 +30,9 @@ import com.jumpy.data.*
 import com.jumpy.`object`.CatObject
 
 object Global {
-    const val MAX_FISHES_ON_SCREEN = 20
+    const val MAX_FISHES_ON_SCREEN = 50
     const val SPAWN_RATE = 1
-    const val catJumpPower = 0.15f
-    const val catJumpPhase = 0.05
-    const val catIdlePhase = 0f
+    const val catJumpPower = 1.5f
 
     var hasInit = false
 
@@ -58,7 +56,7 @@ class GameActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
 //        const val SPAWN_DELAY_MS = 2000L //2 seconds
-        const val SPAWN_DELAY_MS = 700L
+        const val SPAWN_DELAY_MS = 500L
     }
 
     private lateinit var vm: ScoreViewModel
@@ -205,9 +203,7 @@ class GameActivity : AppCompatActivity() {
     fun onUpdate() {
         val scene = arFragment.arSceneView.scene
         val arframe = arFragment.arSceneView.arFrame
-        if (arframe != null && arframe?.camera != null
-            && scene.view.width != 0 && scene.view.height != 0
-        ) {
+        if (arframe != null && scene.view.width != 0 && scene.view.height != 0) {
             // Camera is active
             Global.topLefttPos = CatMath.screenToWorldCoordinates(scene, Vector3(0f, 0f, 0f))
             Global.bottomRightPos =

@@ -8,7 +8,7 @@ import kotlin.math.min
 class Physics (_gravity : Float)
 {
     companion object {
-        const val max_velocity : Float = 1.8f
+        const val max_velocity : Float = 0.5f// 1.8f
     }
 
     private val gravity : Float

@@ -3,6 +3,7 @@ package com.jumpy.`object`
 import android.app.Activity
 import android.content.Context
 import android.opengl.Visibility
+import android.os.CountDownTimer
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
@@ -110,7 +111,7 @@ class FishObject : Node() {
         ViewRenderable.builder()
             .setView(mContext, fishImageView)
             .build()
-            .thenAccept { renderable: ViewRenderable -> this?.renderable = renderable }
+            .thenAccept { renderable: ViewRenderable -> this.renderable = renderable }
             .exceptionally { throwable ->
                 Log.e("Fish Object", "Unable to load renderable", throwable)
                 null
@@ -128,7 +129,10 @@ class FishObject : Node() {
 
         catMunching(frameTime)
 
+        Log.d("Fishposition", localPosition.y.toString())
         if (localPosition.y < -0.2f) {
+
+            Log.d("Fishdestroy", localPosition.y.toString())
             destroy()
         }
     }
@@ -175,17 +179,30 @@ class FishObject : Node() {
 
             if (objectAABB.intersects(catAABB))
             {
-                //Log.d( "FishObject","Cat munching" )
-                destroy()
-                Global.score += 10
-                //Log.d( "Score", Global.score.toString() )
-
                 cat.startedJumping = true
-                if (!cat.isJumping
-                ) //cat not eating other fishes
+                if (!cat.isJumping && !cat.isEating) //cat not eating other fishes
                 {
+                    //Log.d( "FishObject","Cat munching" )
+                    destroy()
+                    Global.score += 10
+                    //Log.d( "Score", Global.score.toString() )
+
+                    val eatingCD = object : CountDownTimer(500, 1000) {
+                        override fun onTick(millisUntilFinished: Long) {
+                            // called every second, update UI or do something
+                        }
+
+                        override fun onFinish() {
+                            // called when the timer finishes
+                            cat.isEating = false
+                            Log.d("eating", "false")
+                        }
+                    }
+
+                    eatingCD.start() // start the timer
+                    cat.isEating = true
                     cat.isJumping = true
-                    cat.physics.acceleration +=  10.0f
+                    cat.physics.acceleration += Global.catJumpPower
                     SoundSystem.playSFX(mContext, R.raw.jump)
 
                 }
