@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.example.SoundSystem
 import com.jumpy.Animator
 import com.jumpy.Spritesheet
 import com.example.jumpy.R
@@ -24,6 +25,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_menu)
+
+        SoundSystem.playBgMusic(this, R.raw.bgm )
 
         val buttonPlay : ImageView = findViewById(R.id.imagePlay)
         val buttonExit : LinearLayout = findViewById(R.id.button_exit)
@@ -85,5 +88,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 finish()
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        SoundSystem.pauseAll()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        SoundSystem.resumeAll()
     }
 }

@@ -14,6 +14,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
+import com.example.SoundSystem
 import com.jumpy.ar.CatFace
 import com.jumpy.CatMath
 import com.jumpy.ar.FaceArFragment
@@ -66,6 +67,7 @@ class GameActivity : AppCompatActivity() {
         if (!checkIsSupportedDeviceOrFinish()) {
             return
         }
+        SoundSystem.playBgMusic(this, R.raw.bgm )
 
         setContentView(R.layout.activity_ui)
         arFragment = supportFragmentManager.findFragmentById(R.id.face_fragment) as FaceArFragment
@@ -338,4 +340,13 @@ class GameActivity : AppCompatActivity() {
         Global.score = 0
     }
 
+    override fun onPause() {
+        super.onPause()
+        SoundSystem.pauseAll()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        SoundSystem.resumeAll()
+    }
 }
