@@ -75,6 +75,7 @@ class GameActivity : AppCompatActivity() {
         if (!checkIsSupportedDeviceOrFinish()) {
             return
         }
+
         SoundSystem.playBgMusic(this, R.raw.ingamebgm )
 
         setContentView(R.layout.activity_ui)
@@ -151,38 +152,43 @@ class GameActivity : AppCompatActivity() {
 
 
         findViewById<ImageButton>(R.id.settings_button).setOnClickListener {
-            Global.gamePaused = true
-
-            val popupLayout = LayoutInflater.from(this).inflate(R.layout.pause_menu, null) as LinearLayout
-            val popupWindow = PopupWindow(
-                popupLayout,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                true
-            )
-
-            val restartBtn = popupLayout.findViewById<Button>(R.id.pauseRestartBtn)
-            val returnMenuBtn = popupLayout.findViewById<Button>(R.id.pauseReturnMenu)
-
-            restartBtn.setOnClickListener()
+            if(!Global.gameOver)
             {
-                reset()
-                popupWindow.dismiss() // Close the popup window when restart button is clicked
-            }
+                Global.gamePaused = true
 
-            returnMenuBtn.setOnClickListener()
-            {
-                val intent = Intent(this@GameActivity, MainActivity::class.java)
-                startActivity(intent)
-                popupWindow.dismiss() // Close the popup window when return to menu button is clicked
-            }
+                val popupLayout = LayoutInflater.from(this).inflate(R.layout.pause_menu, null) as LinearLayout
+                val popupWindow = PopupWindow(
+                    popupLayout,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    true
+                )
 
-            // Show the popup window
-            popupWindow.showAtLocation(findViewById(R.id.game_container), Gravity.CENTER, 0, 0)
+                val restartBtn = popupLayout.findViewById<Button>(R.id.pauseRestartBtn)
+                val returnMenuBtn = popupLayout.findViewById<Button>(R.id.pauseReturnMenu)
 
-            //Popup gone
-            popupWindow.setOnDismissListener {
-                Global.gamePaused = false
+                restartBtn.setOnClickListener()
+                {
+                    reset()
+                    popupWindow.dismiss() // Close the popup window when restart button is clicked
+                }
+
+                returnMenuBtn.setOnClickListener()
+                {
+                    reset()
+                    Global.hasInit = false
+                    val intent = Intent(this@GameActivity, MainActivity::class.java)
+                    startActivity(intent)
+                    popupWindow.dismiss() // Close the popup window when return to menu button is clicked
+                }
+
+                // Show the popup window
+                popupWindow.showAtLocation(findViewById(R.id.game_container), Gravity.CENTER, 0, 0)
+
+                //Popup gone
+                popupWindow.setOnDismissListener {
+                    Global.gamePaused = false
+                }
             }
         }
 
@@ -197,7 +203,6 @@ class GameActivity : AppCompatActivity() {
         val outValue = TypedValue()
         resources.getValue(R.dimen.gamePosZ, outValue, true)
         Global.spawnPosZ = outValue.float
-
     }
 
     fun onUpdate() {
@@ -226,14 +231,6 @@ class GameActivity : AppCompatActivity() {
                 "(${Global.bottomRightPos!!.x}, ${Global.bottomRightPos!!.y})"
             )
 
-            /*NOT WORKING SADGEEEEEE*/
-//            var temp = CatMath.calculateObjectPosition(Global.spawnPosZ, Global.topLefttPos!!.x, Global.topLefttPos!!.y, arFragment.arSceneView.arFrame?.camera?.imageIntrinsics?.getFocalLength()
-//                ?.get(0) ?: 0f)
-//            Global.topLefttPos = Vector3(temp.first,temp.second, 0f)
-//            temp = CatMath.calculateObjectPosition(Global.spawnPosZ, Global.bottomRightPos!!.x, Global.bottomRightPos!!.y, arFragment.arSceneView.arFrame?.camera?.imageIntrinsics?.getFocalLength()
-//                ?.get(0) ?: 0f)
-//            Global.bottomRightPos = Vector3(temp.first,temp.second, 0f)
-
             Global.topLefttPos!!.y = 0.25f //hardcoded
             Global.hasInit = true
 
@@ -243,10 +240,8 @@ class GameActivity : AppCompatActivity() {
                 Global.fishPool[i].initialize()
             }
             startSpawningFishes()
-            //spawnFishes(3)
         }
 
-        //Global.catVelocity += Global.catAccAmuluator * dt
     }
     //TODO display as UI, call during gameover?? -yg
     fun checkHighScore(score: Int) {
@@ -276,8 +271,6 @@ class GameActivity : AppCompatActivity() {
             val x = (Math.random() * (maxX - minX) + minX).toFloat()
 
             val y = Global.topLefttPos!!.y
-            Log.d("spawn pos x", x.toString())
-            Log.d("spawn pos y", y.toString())
             return Vector3(x, y, Global.spawnPosZ)
         }
         return null
@@ -310,10 +303,6 @@ class GameActivity : AppCompatActivity() {
                 val position = randomPosition() ?: return
                 Global.fishPool[i].create(position)
                 Global.fishPool[i].setParent(arFragment.arSceneView.scene)
-
-                //Global.score++
-                //val newScore = Score(value = Global.score)
-                //db.scoreDao().insertScore(newScore)
 
                 Global.numFishesOnScreen++
                 Log.d(

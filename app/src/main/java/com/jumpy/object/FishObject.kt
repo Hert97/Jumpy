@@ -180,9 +180,16 @@ class FishObject : Node() {
                 Log.d("FishObject", "Cat munching")
                 destroy()
                 Global.score += 10
-                cat.isEating = true
-                cat.physics.acceleration += Global.catJumpPower
-                SoundSystem.playSFX(mContext, R.raw.jump)
+                //Log.d( "Score", Global.score.toString() )
+
+                cat.startedJumping = true
+                if (!cat.isJumping) //cat not eating other fishes
+                {
+                    cat.isJumping = true
+                    cat.physics.acceleration +=  10.0f
+                    SoundSystem.playSFX(mContext, R.raw.jump)
+
+                }
             }
         }
     }
