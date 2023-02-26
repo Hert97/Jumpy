@@ -92,15 +92,15 @@ class GameActivity : AppCompatActivity() {
             val adapter = topScores?.let { ScoreAdapter(this, it.toList()) }
             listView.adapter = adapter
 
-
             // TODO:: Change the losing condition
-            if (Global.score > 9)
+            if (Global.catObject?.ifIsDed() == true)
             {
                 gameOverTextView.setVisibility(View.VISIBLE);
                 restartButton.setVisibility(View.VISIBLE);
                 listView.setVisibility(View.VISIBLE);
                 currScore.setVisibility(View.VISIBLE);
                 currScore.setText("Your score is ${Global.score}")
+                Global.catObject!!.reset()
             }
 
             /* Ensuring that there is only 1 face being tracked at a time*/
@@ -127,7 +127,8 @@ class GameActivity : AppCompatActivity() {
                     }
                 }
             if (!Global.hasInit) {
-                onUpdate()
+                if (Global.catObject?.ifIsDed() == false)
+                    onUpdate()
             }
         }
 
