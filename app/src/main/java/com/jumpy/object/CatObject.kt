@@ -27,7 +27,7 @@ class CatObject : Node() {
     var catHeight = 1f
 
     //Physics
-    val physics = Physics(-15f)
+    val physics = Physics(-19.8f)
 
     //Animation
     private lateinit var anime: Animator
@@ -35,13 +35,12 @@ class CatObject : Node() {
     private val animeFrameDuration = 0.4f //seconds
 
     //Game Logic
-    private var clampPosY = 0.05f //cat max Y position for whole of the cat to still be shown on screen
+    private var clampPosY = -0.05f //cat max Y position for whole of the cat to still be shown on screen
     private var originY = -0.18f
 
     var currPosY = originY
     var startedJumping = false
     var isJumping = false
-    var isEating = false
     var isDed = false
 
 
@@ -73,10 +72,10 @@ class CatObject : Node() {
 
     //---------------------------------------------------
     fun reset() {
+        //Global.gameOver = false
         startedJumping = false
         isJumping = false
-        isEating = false
-        setPosY(originY)
+        setPosY(originY) // Global.bottomPosY
         physics.reset()
         startIdleAnim()
         isDed = false
@@ -86,7 +85,7 @@ class CatObject : Node() {
         if(!initialized) return
         characterIV.setImageDrawable(anime.getAnime())
         // Start the animation
-        if(!anime.isPlaying()) anime.start()
+        anime.start()
     }
     //---------------------------------------------------
 
@@ -150,46 +149,37 @@ class CatObject : Node() {
         }
 
         //======================== Jumping ========================
-        Log.d("CatVelocity", physics.velocity.toString())
-
-        if (startedJumping) {
-            physics.update(frameTime)
-            isJumping = physics.velocity >= 0f
-        }
-
-        if(!isEating)
+        if(physics.velocity <= Global.catIdlePhase)
         {
-            if(startedJumping && isJumping)
-            {
-                Log.d("jumping", "true")
-                characterIV.setImageResource(R.drawable.jump)
-            }
-            else
-            {
-                Log.d("falling", "true")
-                startIdleAnim()
-            }
+            startIdleAnim()
+        }
+        else if(physics.velocity < Global.catJumpPhase)
+        {
+            characterIV.setImageResource(R.drawable.jump)
         }
         else
         {
-            Log.d("eating", "true")
             characterIV.setImageResource(R.drawable.eat)
-            isEating = false
+        }
+        if (isJumping) { //is jumping
+            isJumping = false
+
+        } else { //Not jumping
+            if (startedJumping) {
+                physics.update(frameTime)
+            }
         }
 
         // clamp position to stay on screen
         val calculatedPos = physics.applyVelocity(frameTime,getPos())
         calculatedPos.y = min(clampPosY, max(originY - 0.1f,  calculatedPos.y ))
-        setPos(calculatedPos)
+        val newPositionLerp = Vector3.lerp(getPos(), calculatedPos, dt  * Global.camLerpSpeed )
+        setPos(newPositionLerp)
         // Use lerp to move the object smoothly
         //======================== Camera ========================
         val catPos = getPos()
         if (catPos.y >= clampPosY) //If cat reaches top of the screen scroll the fishes
         {
-            val newPositionLerp = Vector3.lerp(getPos(), calculatedPos, dt  * Global.camLerpSpeed )
-            setPos( Vector3(catPos.x,newPositionLerp.y,catPos.z))
-
-            Log.d("scrolling", "true")
             // Calculate the offset to move the fish nodes
             //val offset = abs(catPos.y - originY) * -sign(physics.velocity)
             //val newPosition = Vector3(catPos.x, 0f, catPos.z)

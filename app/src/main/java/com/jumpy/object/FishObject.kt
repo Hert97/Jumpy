@@ -2,8 +2,10 @@ package com.jumpy.`object`
 
 import android.app.Activity
 import android.content.Context
+import android.opengl.Visibility
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.SoundSystem
@@ -16,6 +18,7 @@ import com.google.ar.sceneform.rendering.ViewRenderable
 import com.jumpy.AABB
 import com.jumpy.CatMath
 import com.jumpy.Physics
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.InvisibleFake
 
 
 class FishObject : Node() {
@@ -26,8 +29,11 @@ class FishObject : Node() {
         private var fishWidth: Int = 0
         private var fishHeight: Int = 0
 
+        //private var idCounter = 0
+
         private lateinit var mContext: Context
-        fun initializeFishProp(context: Context) {
+        fun initializeFishProp(context: Context)
+        {
             mContext = context
             if (fishWidth == 0 || fishHeight == 0) {
                 // Get screen size
@@ -40,38 +46,41 @@ class FishObject : Node() {
                 fishWidth = displayMetrics.widthPixels * widthInPercentage / 100
                 fishHeight = displayMetrics.heightPixels * heightInPercentage / 100
             }
+            //fishWidth = 25
+            // fishHeight = 25
         }
     }
 
     private lateinit var fishImageView: ImageView
-    var physics: Physics
-
+    var physics : Physics
     //private var id = -1
     var activated = false
 
     //---------------------------------------------------
-    fun getPos(): Vector3 {
+    fun getPos() : Vector3
+    {
         return worldPosition
     }
-
-    fun setPos(vec: Vector3) {
+    fun setPos(vec : Vector3)
+    {
         worldPosition = vec
     }
-
-    fun setPosx(x: Float) {
+    fun setPosx(x : Float)
+    {
         worldPosition = Vector3(x, worldPosition.y, worldPosition.z)
     }
-
-    fun setPosY(y: Float) {
+    fun setPosY(y : Float)
+    {
         worldPosition = Vector3(worldPosition.x, y, worldPosition.z)
     }
-
-    fun setPosZ(z: Float) {
+    fun setPosZ(z : Float)
+    {
         worldPosition = Vector3(worldPosition.x, worldPosition.y, z)
     }
     //---------------------------------------------------
 
-    fun reset() {
+    fun reset()
+    {
         destroy()
         initialize()
         physics.reset()
@@ -86,15 +95,14 @@ class FishObject : Node() {
         )
         activated = false
     }
-
     init {
         physics = Physics(0.0f)
     }
-
     fun create(position: Vector3) {
         localPosition = Vector3(position.x, position.y, Global.spawnPosZ)
         val gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
         physics = Physics(gravity)
+        //id = idCounter++
         activated = true
 
         fishImageView.setImageResource(R.drawable.fish_25p)
@@ -102,7 +110,7 @@ class FishObject : Node() {
         ViewRenderable.builder()
             .setView(mContext, fishImageView)
             .build()
-            .thenAccept { renderable: ViewRenderable -> this.renderable = renderable }
+            .thenAccept { renderable: ViewRenderable -> this?.renderable = renderable }
             .exceptionally { throwable ->
                 Log.e("Fish Object", "Unable to load renderable", throwable)
                 null
@@ -111,8 +119,7 @@ class FishObject : Node() {
 
     override fun onUpdate(frameTime: FrameTime?) {
         super.onUpdate(frameTime)
-
-        if (Global.gamePaused || Global.gameOver) return
+        if(Global.gamePaused || Global.gameOver) return
 
         if (!activated) return
 
@@ -122,8 +129,6 @@ class FishObject : Node() {
         catMunching(frameTime)
 
         if (localPosition.y < -0.2f) {
-
-            Log.d("Fishdestroy", localPosition.y.toString())
             destroy()
         }
     }
@@ -138,11 +143,12 @@ class FishObject : Node() {
         fishImageView.setImageDrawable(null)
         fishImageView.setImageBitmap(null)
         activated = false
-        // parent?.removeChild(this) //remove this node from the parent "arscene"
+       // parent?.removeChild(this) //remove this node from the parent "arscene"
     }
 
 
-    fun catMunching(frameTime: FrameTime?) {
+    fun catMunching(frameTime: FrameTime?)
+    {
         val dt = frameTime?.deltaSeconds ?: 0f
 
         val cat = Global.catObject
@@ -167,21 +173,21 @@ class FishObject : Node() {
 //            Log.d("FishObject", "objectLocalPos = ${localPosition.x},${localPosition.y},${localPosition.z}")
 //            Log.d("FishObject", "catLocalPos = ${Global.currCatFace!!.localPosition.x},${Global.currCatFace!!.localPosition.y},${Global.currCatFace!!.localPosition.z}")
 
-            if (objectAABB.intersects(catAABB)) {
+            if (objectAABB.intersects(catAABB))
+            {
+                //Log.d( "FishObject","Cat munching" )
+                destroy()
+                Global.score += 10
+                //Log.d( "Score", Global.score.toString() )
+
                 cat.startedJumping = true
-
-                if (!cat.isJumping && !cat.isEating) //cat not eating other fishes
+                if (!cat.isJumping) //cat not eating other fishes
                 {
-                    Log.d("FishObject", "Cat munching")
-                    destroy()
-                    Global.score += 10
-                    //Log.d( "Score", Global.score.toString() )
-
                     cat.isJumping = true
-                    cat.physics.acceleration +=  Global.catJumpPower
+                    cat.physics.acceleration +=  10.0f
                     SoundSystem.playSFX(mContext, R.raw.jump)
+
                 }
-                cat.isEating = true
             }
         }
     }

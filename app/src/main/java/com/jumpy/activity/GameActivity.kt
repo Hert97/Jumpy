@@ -30,9 +30,11 @@ import com.jumpy.data.*
 import com.jumpy.`object`.CatObject
 
 object Global {
-    const val MAX_FISHES_ON_SCREEN = 30
-    const val SPAWN_RATE = 3
-    const val catJumpPower = 10f
+    const val MAX_FISHES_ON_SCREEN = 40
+    var SPAWN_RATE = 7
+    const val catJumpPower = 0.15f
+    const val catJumpPhase = 0.05
+    const val catIdlePhase = 0f
 
     var hasInit = false
 
@@ -56,7 +58,7 @@ class GameActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
 //        const val SPAWN_DELAY_MS = 2000L //2 seconds
-        const val SPAWN_DELAY_MS = 700L
+        var SPAWN_DELAY_MS = 700L
     }
 
     private lateinit var vm: ScoreViewModel
@@ -208,7 +210,9 @@ class GameActivity : AppCompatActivity() {
     fun onUpdate() {
         val scene = arFragment.arSceneView.scene
         val arframe = arFragment.arSceneView.arFrame
-        if (arframe != null && scene.view.width != 0 && scene.view.height != 0) {
+        if (arframe != null && arframe?.camera != null
+            && scene.view.width != 0 && scene.view.height != 0
+        ) {
             // Camera is active
             Global.topLefttPos = CatMath.screenToWorldCoordinates(scene, Vector3(0f, 0f, 0f))
             Global.bottomRightPos =
@@ -283,6 +287,8 @@ class GameActivity : AppCompatActivity() {
                 //checkHighScore(1000)
                 if (!Global.gamePaused && isSpawningFishes) {
                     spawnFishes(Global.SPAWN_RATE)
+                    if(Global.SPAWN_RATE > 1) Global.SPAWN_RATE--
+                    else SPAWN_DELAY_MS += 500
                     handler.postDelayed(this, SPAWN_DELAY_MS)
                 }
             }
@@ -301,7 +307,6 @@ class GameActivity : AppCompatActivity() {
                 toSpawn > 0 && !Global.fishPool[i].activated)
             {
                 val position = randomPosition() ?: return
-                Log.e("Fish update", "here called")
                 Global.fishPool[i].create(position)
                 Global.fishPool[i].setParent(arFragment.arSceneView.scene)
 
