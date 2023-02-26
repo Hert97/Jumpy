@@ -30,9 +30,9 @@ import com.jumpy.data.*
 import com.jumpy.`object`.CatObject
 
 object Global {
-    const val MAX_FISHES_ON_SCREEN = 20
-    const val SPAWN_RATE = 2
-    const val catJumpPower = 3.5f
+    const val MAX_FISHES_ON_SCREEN = 1000
+    const val SPAWN_RATE = 5
+    const val catJumpPower = 10.5f
 
     var hasInit = false
 
@@ -56,7 +56,7 @@ class GameActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
 //        const val SPAWN_DELAY_MS = 2000L //2 seconds
-        const val SPAWN_DELAY_MS = 1000L
+        const val SPAWN_DELAY_MS = 100L
     }
 
     private lateinit var vm: ScoreViewModel
@@ -301,6 +301,7 @@ class GameActivity : AppCompatActivity() {
                 toSpawn > 0 && !Global.fishPool[i].activated)
             {
                 val position = randomPosition() ?: return
+                Log.e("Fish update", "here called")
                 Global.fishPool[i].create(position)
                 Global.fishPool[i].setParent(arFragment.arSceneView.scene)
 

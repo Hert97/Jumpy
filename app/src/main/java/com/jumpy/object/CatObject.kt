@@ -27,7 +27,7 @@ class CatObject : Node() {
     var catHeight = 1f
 
     //Physics
-    val physics = Physics(-4f)
+    val physics = Physics(-10f)
 
     //Animation
     private lateinit var anime: Animator
@@ -73,10 +73,10 @@ class CatObject : Node() {
 
     //---------------------------------------------------
     fun reset() {
-        //Global.gameOver = false
         startedJumping = false
         isJumping = false
-        setPosY(originY) // Global.bottomPosY
+        isEating = false
+        setPosY(originY)
         physics.reset()
         startIdleAnim()
         isDed = false
@@ -217,7 +217,7 @@ class CatObject : Node() {
                 if(dist2 > 10.0f &&  sign(physics.velocity) == sign(Global.fishPool[i].physics.velocity)) {
                     Global.fishPool[i].destroy()
                 }
-                Global.fishPool[i].physics.acceleration += -sign(physics.acceleration) * 0.3f
+                Global.fishPool[i].physics.acceleration += -abs(physics.acceleration) * 0.3f
             }
         }
 

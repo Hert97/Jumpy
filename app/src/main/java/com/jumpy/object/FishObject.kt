@@ -2,11 +2,8 @@ package com.jumpy.`object`
 
 import android.app.Activity
 import android.content.Context
-import android.opengl.Visibility
-import android.os.CountDownTimer
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.SoundSystem
@@ -19,7 +16,6 @@ import com.google.ar.sceneform.rendering.ViewRenderable
 import com.jumpy.AABB
 import com.jumpy.CatMath
 import com.jumpy.Physics
-import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.InvisibleFake
 
 
 class FishObject : Node() {
@@ -29,8 +25,6 @@ class FishObject : Node() {
 
         private var fishWidth: Int = 0
         private var fishHeight: Int = 0
-
-        //private var idCounter = 0
 
         private lateinit var mContext: Context
         fun initializeFishProp(context: Context) {
@@ -46,8 +40,6 @@ class FishObject : Node() {
                 fishWidth = displayMetrics.widthPixels * widthInPercentage / 100
                 fishHeight = displayMetrics.heightPixels * heightInPercentage / 100
             }
-            //fishWidth = 25
-            // fishHeight = 25
         }
     }
 
@@ -103,7 +95,6 @@ class FishObject : Node() {
         localPosition = Vector3(position.x, position.y, Global.spawnPosZ)
         val gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
         physics = Physics(gravity)
-        //id = idCounter++
         activated = true
 
         fishImageView.setImageResource(R.drawable.fish_25p)
@@ -120,6 +111,7 @@ class FishObject : Node() {
 
     override fun onUpdate(frameTime: FrameTime?) {
         super.onUpdate(frameTime)
+
         if (Global.gamePaused || Global.gameOver) return
 
         if (!activated) return
@@ -186,7 +178,7 @@ class FishObject : Node() {
                 if (!cat.isJumping) //cat not eating other fishes
                 {
                     cat.isJumping = true
-                    cat.physics.acceleration +=  10.0f
+                    cat.physics.acceleration +=  Global.catJumpPower
                     SoundSystem.playSFX(mContext, R.raw.jump)
 
                 }
