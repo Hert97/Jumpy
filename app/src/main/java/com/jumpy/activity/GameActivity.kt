@@ -67,7 +67,7 @@ class GameActivity : AppCompatActivity() {
         if (!checkIsSupportedDeviceOrFinish()) {
             return
         }
-        SoundSystem.playBgMusic(this, R.raw.bgm )
+        SoundSystem.playBgMusic(this, R.raw.ingame )
 
         setContentView(R.layout.activity_ui)
         arFragment = supportFragmentManager.findFragmentById(R.id.face_fragment) as FaceArFragment
@@ -92,7 +92,7 @@ class GameActivity : AppCompatActivity() {
                             faceNode.setParent(scene)
                             faceNodeMap[f] = faceNode
                             Global.catObject = faceNode.catNode
-                        }
+                            }
                     }
                     // Remove any AugmentedFaceNodes associated with an AugmentedFace that stopped tracking.
                     val iter = faceNodeMap.entries.iterator()

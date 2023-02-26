@@ -1,8 +1,10 @@
 package com.jumpy.ar
 
 import android.content.Context
+import android.util.Log
 import com.google.ar.core.AugmentedFace
 import com.google.ar.sceneform.FrameTime
+import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.ux.AugmentedFaceNode
 import com.jumpy.activity.Global
 import com.jumpy.`object`.CatObject
@@ -23,6 +25,7 @@ class CatFace(
 
     override fun onUpdate(frameTime: FrameTime?) {
         super.onUpdate(frameTime)
+
         if(Global.gamePaused) return
 
         //Move cat with our nose
@@ -36,6 +39,5 @@ class CatFace(
 //        if(finalY > 0.0)
 //            finalY = 0.0f
         if(noseX != null) catNode.setPosx(noseX!!)
-        catNode.setPosZ(Global.spawnPosZ)
     }
 }

@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_menu)
 
-        SoundSystem.playBgMusic(this, R.raw.bgm )
+        SoundSystem.playBgMusic(this, R.raw.mainmenu )
 
         val buttonPlay : ImageView = findViewById(R.id.imagePlay)
         val buttonExit : LinearLayout = findViewById(R.id.button_exit)
