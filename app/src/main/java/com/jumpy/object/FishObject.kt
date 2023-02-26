@@ -181,8 +181,7 @@ class FishObject : Node() {
                 //Log.d( "Score", Global.score.toString() )
 
                 cat.startedJumping = true
-                if (!cat.isJumping
-                ) //cat not eating other fishes
+                if (!cat.isJumping) //cat not eating other fishes
                 {
                     cat.isJumping = true
                     cat.physics.acceleration +=  10.0f
