@@ -27,7 +27,7 @@ class CatObject : Node() {
     var catHeight = 1f
 
     //Physics
-    val physics = Physics(-2f)
+    val physics = Physics(-4f)
 
     //Animation
     private lateinit var anime: Animator
@@ -127,7 +127,6 @@ class CatObject : Node() {
     //---------------------------------------------------
 
     //---------------------------------------------------
-    private var prevVelocity : Float? = null
     override fun onUpdate(frameTime: FrameTime?)
     {
         super.onUpdate(frameTime)
@@ -155,25 +154,12 @@ class CatObject : Node() {
 
         if (startedJumping) {
             physics.update(frameTime)
-        }
-
-        if(prevVelocity == null)
-        {
-            prevVelocity = physics.velocity
-        }
-        else
-        {
-            if(prevVelocity!! < physics.velocity)
-            {
-                Log.d("setjumptofalse", "false")
-                isJumping = false
-            }
-            prevVelocity = physics.velocity
+            isJumping = physics.velocity >= 0f
         }
 
         if(!isEating)
         {
-            if(isJumping)
+            if(startedJumping && isJumping)
             {
                 Log.d("jumping", "true")
                 characterIV.setImageResource(R.drawable.jump)
@@ -188,6 +174,7 @@ class CatObject : Node() {
         {
             Log.d("eating", "true")
             characterIV.setImageResource(R.drawable.eat)
+            isEating = false
         }
 
         // clamp position to stay on screen
@@ -199,8 +186,8 @@ class CatObject : Node() {
         val catPos = getPos()
         if (catPos.y >= clampPosY) //If cat reaches top of the screen scroll the fishes
         {
-            //val newPositionLerp = Vector3.lerp(getPos(), calculatedPos, dt  * Global.camLerpSpeed )
-            setPos( Vector3(catPos.x,originY,catPos.z))
+            val newPositionLerp = Vector3.lerp(getPos(), calculatedPos, dt  * Global.camLerpSpeed )
+            setPos( Vector3(catPos.x,newPositionLerp.y,catPos.z))
 
             Log.d("scrolling", "true")
             // Calculate the offset to move the fish nodes

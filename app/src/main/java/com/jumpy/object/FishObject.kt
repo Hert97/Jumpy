@@ -33,8 +33,7 @@ class FishObject : Node() {
         //private var idCounter = 0
 
         private lateinit var mContext: Context
-        fun initializeFishProp(context: Context)
-        {
+        fun initializeFishProp(context: Context) {
             mContext = context
             if (fishWidth == 0 || fishHeight == 0) {
                 // Get screen size
@@ -53,35 +52,34 @@ class FishObject : Node() {
     }
 
     private lateinit var fishImageView: ImageView
-    var physics : Physics
+    var physics: Physics
+
     //private var id = -1
     var activated = false
 
     //---------------------------------------------------
-    fun getPos() : Vector3
-    {
+    fun getPos(): Vector3 {
         return worldPosition
     }
-    fun setPos(vec : Vector3)
-    {
+
+    fun setPos(vec: Vector3) {
         worldPosition = vec
     }
-    fun setPosx(x : Float)
-    {
+
+    fun setPosx(x: Float) {
         worldPosition = Vector3(x, worldPosition.y, worldPosition.z)
     }
-    fun setPosY(y : Float)
-    {
+
+    fun setPosY(y: Float) {
         worldPosition = Vector3(worldPosition.x, y, worldPosition.z)
     }
-    fun setPosZ(z : Float)
-    {
+
+    fun setPosZ(z: Float) {
         worldPosition = Vector3(worldPosition.x, worldPosition.y, z)
     }
     //---------------------------------------------------
 
-    fun reset()
-    {
+    fun reset() {
         destroy()
         initialize()
         physics.reset()
@@ -96,9 +94,11 @@ class FishObject : Node() {
         )
         activated = false
     }
+
     init {
         physics = Physics(0.0f)
     }
+
     fun create(position: Vector3) {
         localPosition = Vector3(position.x, position.y, Global.spawnPosZ)
         val gravity = (Math.random() * (maxGravity - minGravity) + minGravity).toFloat()
@@ -120,7 +120,7 @@ class FishObject : Node() {
 
     override fun onUpdate(frameTime: FrameTime?) {
         super.onUpdate(frameTime)
-        if(Global.gamePaused || Global.gameOver) return
+        if (Global.gamePaused || Global.gameOver) return
 
         if (!activated) return
 
@@ -129,7 +129,6 @@ class FishObject : Node() {
 
         catMunching(frameTime)
 
-        Log.d("Fishposition", localPosition.y.toString())
         if (localPosition.y < -0.2f) {
 
             Log.d("Fishdestroy", localPosition.y.toString())
@@ -147,12 +146,11 @@ class FishObject : Node() {
         fishImageView.setImageDrawable(null)
         fishImageView.setImageBitmap(null)
         activated = false
-       // parent?.removeChild(this) //remove this node from the parent "arscene"
+        // parent?.removeChild(this) //remove this node from the parent "arscene"
     }
 
 
-    fun catMunching(frameTime: FrameTime?)
-    {
+    fun catMunching(frameTime: FrameTime?) {
         val dt = frameTime?.deltaSeconds ?: 0f
 
         val cat = Global.catObject
@@ -177,35 +175,14 @@ class FishObject : Node() {
 //            Log.d("FishObject", "objectLocalPos = ${localPosition.x},${localPosition.y},${localPosition.z}")
 //            Log.d("FishObject", "catLocalPos = ${Global.currCatFace!!.localPosition.x},${Global.currCatFace!!.localPosition.y},${Global.currCatFace!!.localPosition.z}")
 
-            if (objectAABB.intersects(catAABB))
-            {
+            if (objectAABB.intersects(catAABB)) {
                 cat.startedJumping = true
-                if (!cat.isJumping && !cat.isEating) //cat not eating other fishes
-                {
-                    Log.d( "FishObject","Cat munching" )
-                    destroy()
-                    Global.score += 10
-                    //Log.d( "Score", Global.score.toString() )
-
-                    val eatingCD = object : CountDownTimer(500, 1000) {
-                        override fun onTick(millisUntilFinished: Long) {
-                            // called every second, update UI or do something
-                        }
-
-                        override fun onFinish() {
-                            // called when the timer finishes
-                            cat.isEating = false
-                            Log.d("eating", "false")
-                        }
-                    }
-
-                    eatingCD.start() // start the timer
-                    cat.isEating = true
-                    cat.isJumping = true
-                    cat.physics.acceleration += Global.catJumpPower
-                    SoundSystem.playSFX(mContext, R.raw.jump)
-
-                }
+                Log.d("FishObject", "Cat munching")
+                destroy()
+                Global.score += 10
+                cat.isEating = true
+                cat.physics.acceleration += Global.catJumpPower
+                SoundSystem.playSFX(mContext, R.raw.jump)
             }
         }
     }
