@@ -119,7 +119,7 @@ class FishObject : Node() {
 
     override fun onUpdate(frameTime: FrameTime?) {
         super.onUpdate(frameTime)
-        if(Global.gamePaused) return
+        if(Global.gamePaused || Global.gameOver) return
 
         if (!activated) return
 

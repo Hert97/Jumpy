@@ -364,6 +364,7 @@ class GameActivity : AppCompatActivity() {
     {
         //reset for session to check highscore
         checkHighScore = true
+        Global.gamePaused = false
         Global.gameOver = false
         for(i in 0 until Global.fishPool.size)
         {

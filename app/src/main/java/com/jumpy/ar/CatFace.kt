@@ -19,14 +19,14 @@ class CatFace(
     override fun onActivate() {
         super.onActivate()
 
-        catNode?.setParent(this)
+        catNode.setParent(this)
         catNode.initialize(mContext)
     }
 
     override fun onUpdate(frameTime: FrameTime?) {
         super.onUpdate(frameTime)
 
-        if(Global.gamePaused) return
+        if(Global.gamePaused || Global.gameOver) return
 
         //Move cat with our nose
         var noseX : Float? = null
