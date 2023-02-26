@@ -1,5 +1,3 @@
-#readme 
-
 1. [Requirements](#requirements)
 2. [Compliation](#compilation)
 3. [Credits](#credits)
