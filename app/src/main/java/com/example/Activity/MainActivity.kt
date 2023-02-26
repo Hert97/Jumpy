@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 //        val anime = Animator(catImageView, resources, frames, null)
         anime.setImageView(catImageView)
         anime.start()
-        SoundSystem.playBgMusic(this, R.raw.ambience)
+        SoundSystem.playBgMusic(this, R.raw.bgmClassic)
     }
 
     override fun onPause() {

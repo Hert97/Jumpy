@@ -97,7 +97,7 @@ class GameActivity : AppCompatActivity() {
                 }
             if(test != Global.score)
             {
-                SoundSystem.playSFX(this,R.raw.munch)
+                SoundSystem.playSFX(this,R.raw.jump)
                 test = Global.score
             }
         }
@@ -143,7 +143,7 @@ class GameActivity : AppCompatActivity() {
         Global.bottomPosY = Global.bottomPosY!! * -1f
         Log.d("Base Pos Y", Global.bottomPosY.toString())
 
-   //   SoundSystem.playBgMusic(this, R.raw.water)
+        SoundSystem.playBgMusic(this, R.raw.bgmClassic)
 
       startSpawningFishes()
         //spawnFishes(1)
