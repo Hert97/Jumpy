@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pauseMenu"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/gamePaused"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/comic_neue_bold_italic"
+        android:gravity="center"
+        android:text="GAME PAUSED"
+        android:textSize="50sp"
+        android:paddingBottom="50dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp">
+
+        <Button
+            android:id="@+id/pauseRestartBtn"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginBottom="80dp"
+            android:background="@drawable/rounded_bg"
+            android:fontFamily="@font/comic_neue_bold_italic"
+            android:gravity="center"
+            android:text="RESTART"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/pauseReturnMenu"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="@drawable/rounded_bg"
+            android:fontFamily="@font/comic_neue_bold_italic"
+            android:gravity="center"
+            android:text="RETURN TO MAIN MENU"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+    </LinearLayout>
+
+</LinearLayout>

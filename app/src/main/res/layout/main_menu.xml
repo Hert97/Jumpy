@@ -91,7 +91,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="left"
                     android:padding="15dp"
-                    android:src="@drawable/icon_home" />
+                    android:src="@drawable/icon_crown" />
             </FrameLayout>
         </LinearLayout>
 
@@ -129,7 +129,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="left"
                     android:padding="15dp"
-                    android:src="@drawable/icon_home" />
+                    android:src="@drawable/icon_exit" />
             </FrameLayout>
         </LinearLayout>
 

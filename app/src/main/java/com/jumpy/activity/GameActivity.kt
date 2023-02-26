@@ -2,15 +2,17 @@ package com.jumpy.activity
 
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import com.jumpy.ar.CatFace
 import com.jumpy.CatMath
@@ -37,6 +39,8 @@ object Global {
     var camLerpSpeed = 2.0f
     var topLefttPos : Vector3? = null
     var bottomRightPos : Vector3? = null
+
+    var gamePaused = false
 
     var numFishesOnScreen = 0
     var score = 0
@@ -107,9 +111,39 @@ class GameActivity : AppCompatActivity() {
 
 
         findViewById<ImageButton>(R.id.settings_button).setOnClickListener {
-            //Restart Button
-            reset()
-            //Back to main menu Button
+            Global.gamePaused = true
+
+            val popupLayout = LayoutInflater.from(this).inflate(R.layout.pause_menu, null) as LinearLayout
+            val popupWindow = PopupWindow(
+                popupLayout,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                true
+            )
+
+            val restartBtn = popupLayout.findViewById<Button>(R.id.pauseRestartBtn)
+            val returnMenuBtn = popupLayout.findViewById<Button>(R.id.pauseReturnMenu)
+
+            restartBtn.setOnClickListener()
+            {
+                reset()
+                popupWindow.dismiss() // Close the popup window when restart button is clicked
+            }
+
+            returnMenuBtn.setOnClickListener()
+            {
+                val intent = Intent(this@GameActivity, MainActivity::class.java)
+                startActivity(intent)
+                popupWindow.dismiss() // Close the popup window when return to menu button is clicked
+            }
+
+            // Show the popup window
+            popupWindow.showAtLocation(findViewById(R.id.game_container), Gravity.CENTER, 0, 0)
+
+            //Popup gone
+            popupWindow.setOnDismissListener {
+                Global.gamePaused = false
+            }
         }
 
         // setting up viewmodel

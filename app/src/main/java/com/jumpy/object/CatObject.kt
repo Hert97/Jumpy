@@ -37,6 +37,8 @@ class CatObject : Node() {
     //Game Logic
     private var clampPosY = -0.05f //cat max Y position for whole of the cat to still be shown on screen
     private var originY = -0.18f
+
+    var currPosY = -0.5f
     var startedJumping = false
     var isJumping = false
 
@@ -122,6 +124,8 @@ class CatObject : Node() {
     override fun onUpdate(frameTime: FrameTime?)
     {
         super.onUpdate(frameTime)
+        if(Global.gamePaused) return
+
         if(!initialized) return
         if(!animeStarted)
         {
