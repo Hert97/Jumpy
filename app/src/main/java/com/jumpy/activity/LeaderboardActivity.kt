@@ -23,6 +23,14 @@ class LeaderboardActivity : AppCompatActivity() {
     private lateinit var vm: ScoreViewModel
     private lateinit var listView: ListView
 
+    private val hs = mutableListOf(
+        HighScore("Alice", 100),
+        HighScore("Bob", 90),
+        HighScore("Charlie", 80),
+        HighScore("David", 70),
+        HighScore("Emma", 60)
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_leaderboard)
@@ -32,20 +40,23 @@ class LeaderboardActivity : AppCompatActivity() {
         listView.addHeaderView(headerView)
 
         // setting up viewmodel
-        val database = AppDatabase.getDatabase(this) //crashes here
+        val database = AppDatabase.getDatabase(this)
         val repository = ScoreRepo(database.scoreDao())
         vm = ViewModelProvider(this, ScoreViewModelFactory(repository))[ScoreViewModel::class.java]
         vm.getAllScore().observe(this) {
             Log.d("Database","Score has changed")
         }
 
-        val allScores = vm.getAllScore().value
-        val topScores = allScores?.take(5)
-        val adapter = topScores?.let { ScoreAdapter(this, it.toList()) }
-        listView.adapter = adapter
+        vm.getAllScore().observeForever { scores ->
+            val top5 = scores.sortedByDescending { it.value }.take(5)
 
-//
-//        listView.adapter = adapter
+            scores.filter { it !in top5 }.forEach { vm.deleteScore(it) }
+            
+            val allScores = vm.getAllScore().value
+            val topScores = allScores?.take(5)
+            val adapter = topScores?.let { ScoreAdapter(this, it.toList()) }
+            listView.adapter = adapter
+        }
     }
 
 }
