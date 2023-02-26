@@ -131,7 +131,7 @@ class CatObject : Node() {
     override fun onUpdate(frameTime: FrameTime?)
     {
         super.onUpdate(frameTime)
-        if(Global.gamePaused) return
+        //if(Global.gamePaused) return
 
         if(!initialized) return
         if(!animeStarted)
@@ -176,7 +176,7 @@ class CatObject : Node() {
         val calculatedPos = physics.applyVelocity(frameTime,getPos())
         calculatedPos.y = min(clampPosY, max(originY - 0.1f,  calculatedPos.y ))
         // Use lerp to move the object smoothly
-        val newPositionLerp = Vector3.lerp(getPos(), calculatedPos, dt  * Global.camLerpSpeed )
+        val newPositionLerp = Vector3.lerp(getPos(), calculatedPos, dt  * abs(physics.velocity) )
         setPos(newPositionLerp)
         //======================== Camera ========================
         val catPos = getPos()
@@ -190,7 +190,7 @@ class CatObject : Node() {
             //val newPositionLerp = Vector3.lerp(catPos, newPosition, dt * Global.camLerpSpeed)
             //Log.d("DT:",dt.toString())
             //setPos(newPositionLerp)
-
+            setPos(Vector3(catPos.x,originY,catPos.z))
             // increase acceleration for scrolling effect
             for (i in 0 until Global.MAX_FISHES_ON_SCREEN) {
                 /*val tempPos = Global.fishPool[i].worldPosition

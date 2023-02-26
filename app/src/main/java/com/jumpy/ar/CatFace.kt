@@ -23,7 +23,7 @@ class CatFace(
 
     override fun onUpdate(frameTime: FrameTime?) {
         super.onUpdate(frameTime)
-        if(Global.gamePaused) return
+        //if(Global.gamePaused) return
 
         //Move cat with our nose
         var noseX : Float? = null

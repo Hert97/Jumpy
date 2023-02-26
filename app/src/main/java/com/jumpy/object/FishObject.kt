@@ -18,6 +18,7 @@ import com.google.ar.sceneform.rendering.ViewRenderable
 import com.jumpy.AABB
 import com.jumpy.CatMath
 import com.jumpy.Physics
+import kotlin.math.abs
 import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.InvisibleFake
 
 
@@ -119,7 +120,7 @@ class FishObject : Node() {
 
     override fun onUpdate(frameTime: FrameTime?) {
         super.onUpdate(frameTime)
-        if(Global.gamePaused) return
+        //if(Global.gamePaused) return
 
         if (!activated) return
 
@@ -185,7 +186,7 @@ class FishObject : Node() {
                 ) //cat not eating other fishes
                 {
                     cat.isJumping = true
-                    cat.physics.acceleration +=  10.0f
+                    cat.physics.acceleration +=  20.0f
                     SoundSystem.playSFX(mContext, R.raw.jump)
 
                 }
