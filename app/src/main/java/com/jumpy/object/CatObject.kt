@@ -37,6 +37,8 @@ class CatObject : Node() {
     //Game Logic
     private var clampPosY = -0.05f //cat max Y position for whole of the cat to still be shown on screen
     private var originY = -0.18f
+
+    var currPosY = originY
     var startedJumping = false
     var isJumping = false
     var isDed = false
@@ -49,23 +51,21 @@ class CatObject : Node() {
     }
     fun getPos() : Vector3
     {
-        return worldPosition
+        return Vector3(worldPosition.x, currPosY, Global.spawnPosZ)
     }
     fun setPos(vec : Vector3)
     {
-        worldPosition = vec
+        currPosY = vec.y
+        worldPosition = Vector3(vec.x, vec.y, Global.spawnPosZ)
     }
     fun setPosx(x : Float)
     {
-        worldPosition = Vector3(x, worldPosition.y, worldPosition.z)
+        worldPosition = Vector3(x, currPosY, Global.spawnPosZ)
     }
     fun setPosY(y : Float)
     {
-        worldPosition = Vector3(worldPosition.x, y, worldPosition.z)
-    }
-    fun setPosZ(z : Float)
-    {
-        worldPosition = Vector3(worldPosition.x, worldPosition.y, z)
+        currPosY = y
+        worldPosition = Vector3(worldPosition.x, currPosY, Global.spawnPosZ)
     }
     //---------------------------------------------------
 
@@ -129,6 +129,8 @@ class CatObject : Node() {
     override fun onUpdate(frameTime: FrameTime?)
     {
         super.onUpdate(frameTime)
+        if(Global.gamePaused) return
+
         if(!initialized) return
         if(!animeStarted)
         {
@@ -168,6 +170,7 @@ class CatObject : Node() {
                 physics.update(frameTime)
             }
         }
+
         // clamp position to stay on screen
         val calculatedPos = physics.applyVelocity(frameTime,getPos())
         calculatedPos.y = min(clampPosY, max(originY - 0.1f,  calculatedPos.y ))

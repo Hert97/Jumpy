@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.example.SoundSystem
 import com.jumpy.activity.Global
 import com.example.jumpy.R
 import com.google.ar.sceneform.FrameTime
@@ -118,6 +119,8 @@ class FishObject : Node() {
 
     override fun onUpdate(frameTime: FrameTime?) {
         super.onUpdate(frameTime)
+        if(Global.gamePaused) return
+
         if (!activated) return
 
         physics.update(frameTime)
@@ -178,10 +181,12 @@ class FishObject : Node() {
                 //Log.d( "Score", Global.score.toString() )
 
                 cat.startedJumping = true
-                if (!cat.isJumping) //cat not eating other fishes
+                if (!cat.isJumping
+                ) //cat not eating other fishes
                 {
                     cat.isJumping = true
                     cat.physics.acceleration +=  10.0f
+                    SoundSystem.playSFX(mContext, R.raw.jump)
 
                 }
             }
