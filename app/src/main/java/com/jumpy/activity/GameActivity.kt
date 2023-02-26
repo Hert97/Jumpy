@@ -32,7 +32,7 @@ import com.jumpy.`object`.CatObject
 object Global {
     const val MAX_FISHES_ON_SCREEN = 30
     const val SPAWN_RATE = 3
-    const val catJumpPower = 5f
+    const val catJumpPower = 10f
 
     var hasInit = false
 
