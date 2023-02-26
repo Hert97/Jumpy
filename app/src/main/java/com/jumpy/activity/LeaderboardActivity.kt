@@ -1,63 +1,51 @@
 package com.jumpy.activity
 
+import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.jumpy.R
+import com.jumpy.data.AppDatabase
+import com.jumpy.data.ScoreRepo
+import com.jumpy.data.ScoreViewModel
+import com.jumpy.data.ScoreViewModelFactory
 
 class LeaderboardActivity : AppCompatActivity() {
     private inner class HighScore(val name: String, val score: Int)
     private val highScores = mutableListOf<HighScore>()
+    private lateinit var vm: ScoreViewModel
+    private lateinit var listView: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_leaderboard)
 
-        highScores.add(HighScore("Alice", 100))
-        highScores.add(HighScore("Bob", 80))
-        highScores.add(HighScore("Charlie", 70))
-        highScores.add(HighScore("David", 60))
-        highScores.add(HighScore("Eve", 50))
+        listView = findViewById(R.id.leaderboard)
+        val headerView = LayoutInflater.from(this).inflate(R.layout.list_item_score, null)
+        listView.addHeaderView(headerView)
 
-        val sortedHighScores = highScores.sortedByDescending { it.score }
-        val topFiveHighScores = sortedHighScores.take(5)
-
-        val leaderboardList = findViewById<LinearLayout>(R.id.leaderboard_list)
-
-        topFiveHighScores.forEachIndexed { index, highScore ->
-            val rankTextView = TextView(this)
-            rankTextView.text = (index + 1).toString()
-            rankTextView.textSize = 18f
-            rankTextView.layoutParams = LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-            )
-            rankTextView.textAlignment = View.TEXT_ALIGNMENT_CENTER
-
-            val nameTextView = TextView(this)
-            nameTextView.text = highScore.name
-            nameTextView.textSize = 18f
-            nameTextView.layoutParams = LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.WRAP_CONTENT, 2f
-            )
-            nameTextView.textAlignment = View.TEXT_ALIGNMENT_CENTER
-
-            val scoreTextView = TextView(this)
-            scoreTextView.text = highScore.score.toString()
-            scoreTextView.textSize = 18f
-            scoreTextView.layoutParams = LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-            )
-            scoreTextView.textAlignment = View.TEXT_ALIGNMENT_CENTER
-
-            val rowLayout = LinearLayout(this)
-            rowLayout.orientation = LinearLayout.HORIZONTAL
-            rowLayout.addView(rankTextView)
-            rowLayout.addView(nameTextView)
-            rowLayout.addView(scoreTextView)
-
-            leaderboardList.addView(rowLayout)
+        // setting up viewmodel
+        val database = AppDatabase.getDatabase(this) //crashes here
+        val repository = ScoreRepo(database.scoreDao())
+        vm = ViewModelProvider(this, ScoreViewModelFactory(repository))[ScoreViewModel::class.java]
+        vm.getAllScore().observe(this) {
+            Log.d("Database","Score has changed")
         }
+
+        val allScores = vm.getAllScore().value
+        val topScores = allScores?.take(5)
+        val adapter = topScores?.let { ScoreAdapter(this, it.toList()) }
+        listView.adapter = adapter
+
+//
+//        listView.adapter = adapter
     }
+
 }

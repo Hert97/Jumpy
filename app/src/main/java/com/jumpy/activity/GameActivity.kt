@@ -104,7 +104,7 @@ class GameActivity : AppCompatActivity() {
             val adapter = topScores?.let { ScoreAdapter(this, it.toList()) }
             listView.adapter = adapter
 
-            // TODO:: Change the losing condition
+            //game over
             if (Global.gameOver)
             {
                 if(checkHighScore) {
@@ -138,7 +138,8 @@ class GameActivity : AppCompatActivity() {
                     }
                 }
             if (!Global.hasInit) {
-                onUpdate()
+                if (Global.catObject?.ifIsDed() == false)
+                    onUpdate()
             }
         }
 

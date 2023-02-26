@@ -39,9 +39,14 @@ class CatObject : Node() {
     private var originY = -0.18f
     var startedJumping = false
     var isJumping = false
+    var isDed = false
 
 
     //---------------------------------------------------
+    fun ifIsDed() : Boolean
+    {
+        return isDed
+    }
     fun getPos() : Vector3
     {
         return worldPosition
@@ -73,6 +78,7 @@ class CatObject : Node() {
         setPosY(originY) // Global.bottomPosY
         physics.reset()
         startIdleAnim()
+        isDed = false
     }
 
     fun startIdleAnim() {
