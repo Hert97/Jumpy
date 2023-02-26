@@ -58,7 +58,7 @@ class GameActivity : AppCompatActivity() {
     companion object {
         const val MIN_OPENGL_VERSION = 3.0
 //        const val SPAWN_DELAY_MS = 2000L //2 seconds
-        var SPAWN_DELAY_MS = 700L
+        var SPAWN_DELAY_MS = 300L
     }
 
     private lateinit var vm: ScoreViewModel
@@ -287,8 +287,8 @@ class GameActivity : AppCompatActivity() {
                 //checkHighScore(1000)
                 if (!Global.gamePaused && isSpawningFishes) {
                     spawnFishes(Global.SPAWN_RATE)
-                    if(Global.SPAWN_RATE > 1) Global.SPAWN_RATE--
-                    else SPAWN_DELAY_MS += 500
+                    if(Global.SPAWN_RATE > 2) Global.SPAWN_RATE--
+                    SPAWN_DELAY_MS += 500
                     handler.postDelayed(this, SPAWN_DELAY_MS)
                 }
             }
@@ -368,6 +368,8 @@ class GameActivity : AppCompatActivity() {
         Global.score = 0
 
         displayHighScore(false)
+        Global.SPAWN_RATE = 7
+        SPAWN_DELAY_MS = 700L
     }
 
     override fun onPause() {
