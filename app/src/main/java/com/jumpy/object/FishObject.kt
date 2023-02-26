@@ -169,19 +169,19 @@ class FishObject : Node() {
 
             if (objectAABB.intersects(catAABB)) {
                 cat.startedJumping = true
-                Log.d("FishObject", "Cat munching")
-                destroy()
-                Global.score += 10
-                //Log.d( "Score", Global.score.toString() )
 
-                cat.startedJumping = true
-                if (!cat.isJumping) //cat not eating other fishes
+                if (!cat.isJumping && !cat.isEating) //cat not eating other fishes
                 {
+                    Log.d("FishObject", "Cat munching")
+                    destroy()
+                    Global.score += 10
+                    //Log.d( "Score", Global.score.toString() )
+
                     cat.isJumping = true
                     cat.physics.acceleration +=  Global.catJumpPower
                     SoundSystem.playSFX(mContext, R.raw.jump)
-
                 }
+                cat.isEating = true
             }
         }
     }
