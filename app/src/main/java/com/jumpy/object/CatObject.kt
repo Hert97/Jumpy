@@ -27,7 +27,7 @@ class CatObject : Node() {
     var catHeight = 1f
 
     //Physics
-    val physics = Physics(-10f)
+    val physics = Physics(-15f)
 
     //Animation
     private lateinit var anime: Animator
