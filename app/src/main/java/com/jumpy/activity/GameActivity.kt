@@ -323,6 +323,7 @@ class GameActivity : AppCompatActivity() {
         gameOverTextView.visibility = visiblity;
         restartButton.visibility = visiblity;
         listView.visibility = visiblity;
+        currScore.setText("You scored ${Global.score}!")
         currScore.visibility = visiblity;
     }
     private fun reset()
