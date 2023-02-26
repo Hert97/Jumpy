@@ -140,6 +140,13 @@ class GameActivity : AppCompatActivity() {
             //Back to main menu Button
         }
 
+        restartButton.setOnClickListener(){
+            reset()
+            gameOverTextView.setVisibility(View.INVISIBLE)
+            listView.setVisibility(View.INVISIBLE)
+            currScore.setVisibility(View.INVISIBLE);
+        }
+
         // setting up viewmodel
         vm = ViewModelProvider(this, ScoreViewModelFactory(repository))[ScoreViewModel::class.java]
         vm.getAllScore().observe(this) {
